@@ -1,0 +1,106 @@
+#======================================================#
+# Boring details
+
+set imap_user = "leo.yan@linaro.org"
+set imap_pass = "xxxx"
+
+set smtp_url = "smtps://leo.yan@linaro.org@smtp.gmail.com:465/"
+set smtp_pass = "xxxx"
+set from = "leo.yan@linaro.org"
+set realname = "Leo Yan"
+set use_from = yes
+set envelope_from ="yes"
+
+set folder = "imaps://imap.googlemail.com:993"
+set spoolfile = "+INBOX"
+set postponed="+[Gmail]/Drafts"
+set trash = "imaps://imap.gmail.com/[Gmail]/Bin"
+set imap_check_subscribed="yes"
+set imap_list_subscribed="yes"
+
+set header_cache=~/.mutt/cache/headers
+set message_cachedir=~/.mutt/cache/bodies
+set certificate_file=~/.mutt/certificates
+set pager_index_lines=30
+set move=no
+
+#======================================================#
+# Use a signature
+set signature="~/.signature"
+
+#======================================================#
+# which editor do you want to use?
+# vim of course!
+set editor="vim -c 'set tw=70 et' '+/^$' "
+set edit_headers=no  # See the headers when editing
+
+#======================================================#
+# Odds and ends
+set markers          # mark wrapped lines of text in the pager with a +
+set smart_wrap       # Don't wrap mid-word
+set pager_context=5  # Retain 5 lines of previous page when scrolling.
+set status_on_top    # Status bar on top.
+push <show-version>  # Shows mutt version at startup
+
+#======================================================#
+# set up the sidebar, default not visible
+set sidebar_width=24
+set sidebar_visible=yes
+set sidebar_delim='|'
+set sidebar_sort=yes
+
+# color of folders with new mail
+color sidebar_new yellow default
+
+#======================================================#
+# set up address book
+set alias_file= ~/.mutt/aliases
+set sort_alias= alias
+set reverse_alias=yes
+source $alias_file
+set query_command = "abook --mutt-query '%s'"
+macro generic,index,pager \ca "<shell-escape>abook<return>" "launch abook"
+#macro index,pager A "<pipe-message>abook --add-email<return>" "add the sender address to abook"
+
+#======================================================#
+# set up web browser
+macro index \cb |urlview\n
+macro pager \cb |urlview\n
+
+set pager_index_lines=10
+
+#source /home/leoy/.mutt/mutt-colors-solarized-light-16.muttrc
+source /home/leoy/.mutt/mutt-colors-solarized-dark-16.muttrc
+#source /home/leoy/.mutt/mutt-colors-solarized-simple.muttrc
+#source /home/leoy/.mutt/mutt-colors-solarized-dark-256.muttrc
+
+# Default color definitions
+# color normal     white         default
+# color hdrdefault green         default
+# color quoted     green         default
+# color quoted1    yellow        default
+# color quoted2    red           default
+# color signature  cyan          default
+# color indicator  brightyellow  red 
+# color error      brightred     default
+# color status     brightwhite   blue
+# color tree       brightmagenta default
+# color tilde      brightblue    default
+# color attachment brightyellow  magenta
+# color markers    brightred     default
+# color message    white         default
+# color search     brightwhite   magenta
+# color bold       brightyellow  green
+# 
+# # Color definitions when on a mono screen
+# mono bold      bold
+# mono underline underline
+# mono indicator reverse
+# mono error     bold
+# 
+# # Colors for items in the reader
+# color header brightyellow default "^(From|Subject):"
+# color header brightcyan   default ^To:
+# color header brightcyan   default ^Cc:
+# mono  header bold                 "^(From|Subject):"
+
