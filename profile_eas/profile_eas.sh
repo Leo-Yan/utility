@@ -39,6 +39,36 @@ calculate_idle_diff()
 	./calc_idle_diff.py --ifile=$RESULT/$1/idlestat_compare.txt --ofile=$RESULT/$1/idlestat_diff.txt
 }
 
+calculate_sched_perf()
+{
+	if [ -e $RESULT/$1/sched_perf.txt ]; then
+		rm $RESULT/$1/sched_perf.txt
+	fi
+
+	echo "== ORIGINAL"      > $RESULT/$1/sched_perf.txt
+	echo ""                >> $RESULT/$1/sched_perf.txt
+
+	./calc_sched_preformance.py --threads=8 --logprefix=$BASELN/$1/$1-thread0- -o $RESULT/$1/sched_perf.txt
+
+	echo ""                >> $RESULT/$1/sched_perf.txt
+	echo "== EAS DIS"      >> $RESULT/$1/sched_perf.txt
+	echo ""                >> $RESULT/$1/sched_perf.txt
+
+	./calc_sched_preformance.py --threads=8 --logprefix=$EASDIS/$1/$1-thread0- -o $RESULT/$1/sched_perf.txt
+
+	echo ""                >> $RESULT/$1/sched_perf.txt
+	echo "== EAS NDM"      >> $RESULT/$1/sched_perf.txt
+	echo ""                >> $RESULT/$1/sched_perf.txt
+
+	./calc_sched_preformance.py --threads=8 --logprefix=$EASNDM/$1/$1-thread0- -o $RESULT/$1/sched_perf.txt
+
+	echo ""                >> $RESULT/$1/sched_perf.txt
+	echo "== EAS SCHED"    >> $RESULT/$1/sched_perf.txt
+	echo ""                >> $RESULT/$1/sched_perf.txt
+
+	./calc_sched_preformance.py --threads=8 --logprefix=$EASHED/$1/$1-thread0- -o $RESULT/$1/sched_perf.txt
+}
+
 compare_trace_file mp3
 compare_trace_file rt-app-6
 compare_trace_file rt-app-13
@@ -58,3 +88,12 @@ calculate_idle_diff rt-app-31
 calculate_idle_diff rt-app-38
 calculate_idle_diff rt-app-44
 calculate_idle_diff rt-app-50
+
+calculate_sched_perf rt-app-6
+calculate_sched_perf rt-app-13
+calculate_sched_perf rt-app-19
+calculate_sched_perf rt-app-25
+calculate_sched_perf rt-app-31
+calculate_sched_perf rt-app-38
+calculate_sched_perf rt-app-44
+calculate_sched_perf rt-app-50
