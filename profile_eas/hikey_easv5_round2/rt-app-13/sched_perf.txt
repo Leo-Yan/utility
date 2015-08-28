@@ -1,0 +1,51 @@
+== ORIGINAL
+
+cpu0: 684
+cpu1: 685
+cpu2: 686
+cpu3: 706
+cpu4: 709
+cpu5: 691
+cpu6: 704
+cpu7: 708
+Performan (sum): 5573
+Performan (avg): 696
+
+== EAS DIS
+
+cpu0: 635
+cpu1: 631
+cpu2: 630
+cpu3: 634
+cpu4: 636
+cpu5: 636
+cpu6: 640
+cpu7: 636
+Performan (sum): 5078
+Performan (avg): 634
+
+== EAS NDM
+
+cpu0: 248
+cpu1: 676
+cpu2: 467
+cpu3: 523
+cpu4: 648
+cpu5: 516
+cpu6: 249
+cpu7: 465
+Performan (sum): 3792
+Performan (avg): 474
+
+== EAS SCHED
+
+cpu0: 328
+cpu1: 311
+cpu2: 388
+cpu3: 377
+cpu4: 371
+cpu5: 311
+cpu6: 333
+cpu7: 365
+Performan (sum): 2784
+Performan (avg): 348
