@@ -69,6 +69,17 @@ calculate_sched_perf()
 	./calc_sched_preformance.py --threads=8 --logprefix=$EASHED/$1/$1-thread0- -o $RESULT/$1/sched_perf.txt
 }
 
+calculate_pstate_time()
+{
+	if [ -e $RESULT/$1/pstate_time.txt ]; then
+		rm $RESULT/$1/pstate_time.txt
+	fi
+
+	./calc_pstate_time.py --ifile1=$BASELN/$1/report.log --ifile2=$EASDIS/$1/report.log \
+			      --ifile3=$EASNDM/$1/report.log --ifile4=$EASHED/$1/report.log \
+			      --ofile=$RESULT/$1/pstate_time.txt
+}
+
 compare_trace_file mp3
 compare_trace_file rt-app-6
 compare_trace_file rt-app-13
@@ -97,3 +108,13 @@ calculate_sched_perf rt-app-31
 calculate_sched_perf rt-app-38
 calculate_sched_perf rt-app-44
 calculate_sched_perf rt-app-50
+
+calculate_pstate_time mp3
+calculate_pstate_time rt-app-6
+calculate_pstate_time rt-app-13
+calculate_pstate_time rt-app-19
+calculate_pstate_time rt-app-25
+calculate_pstate_time rt-app-31
+calculate_pstate_time rt-app-38
+calculate_pstate_time rt-app-44
+calculate_pstate_time rt-app-50
