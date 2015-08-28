@@ -1,0 +1,61 @@
+[begin] (Fluxbox) {}
+   [exec] (Gaim) {/usr/bin/gaim}
+   [exec] (Firefox) {/usr/bin/firefox}
+   [exec] (Irssi) { x-terminal-emulator -T "irssi-text" -e /usr/bin/irssi-text}
+   [exec] (Bash) { x-terminal-emulator -T "Bash" -e /bin/bash --login}
+   [exec] (BMP) {/usr/bin/beep-media-player}
+   [exec] (VLC) {/usr/bin/vlc}
+   [exec] (F-Spot) {/usr/bin/f-spot}
+   [exec] (Acrobat Reader) {/usr/bin/acroread}
+   [submenu] (Apps) {}
+        [submenu] (Editors) {}
+            [exec] (Emacs) {/usr/bin/emacs21}
+            [exec] (Nano) { x-terminal-emulator -T "Nano" -e /bin/nano}
+        [end]
+        [submenu] (Net) {}
+            [exec] (Telnet) { x-terminal-emulator -T "Telnet" -e /usr/bin/telnet}
+            [exec] (w3m) { x-terminal-emulator -T "w3m" -e /usr/bin/w3m /usr/share/doc/w3m/MANUAL.html}
+        [end]
+        [submenu] (Programming) {}
+            [exec] (Python) { x-terminal-emulator -T "Python (v2.4)" -e /usr/bin/python2.4}
+        [end]
+        [submenu] (Shells) {}
+
+            [exec] (Dash) { x-terminal-emulator -T "Dash" -e /bin/dash -i}
+            [exec] (Sh) { x-terminal-emulator -T "Sh" -e /bin/sh --login}
+        [end]
+        [submenu] (System) {}
+            [exec] (gkrellm) { /usr/bin/gkrellm }
+            [submenu] (Admin) {}
+                [exec] (alsaconf) { x-terminal-emulator -T "alsaconf" -e /usr/sbin/su-to-root -p root -c /usr/sbin/alsaconf}
+                [exec] (pppconfig) { x-terminal-emulator -T "pppconfig" -e /usr/sbin/su-to-root -p root -c /usr/sbin/pppconfig}
+            [end]
+            [exec] (aptitude) { x-terminal-emulator -T "aptitude" -e /usr/bin/aptitude}
+            [exec] (DSL/PPPoE configuration tool) { x-terminal-emulator -T "DSL/PPPoE configuration tool" -e /usr/sbin/pppoeconf}
+            [exec] (GDM flexiserver) {gdmflexiserver}
+            [exec] (GDM flexiserver in Xnest) {gdmflexiserver -n}
+            [exec] (GDM Photo Setup) {gdmphotosetup}
+            [exec] (GDM Setup) {gksu gdmsetup}
+            [exec] (pstree) { x-terminal-emulator -T "pstree" -e /usr/bin/pstree.x11}
+            [exec] (reportbug) { x-terminal-emulator -T "reportbug" -e /usr/bin/reportbug --exit-prompt}
+            [exec] (Run as different user) {/usr/bin/gksuexec}
+            [exec] (Top) { x-terminal-emulator -T "Top" -e /usr/bin/top}
+            [exec] (X-Terminal as root) {/usr/bin/gksu -u root /usr/bin/x-terminal-emulator}
+        [end]
+    [end]
+    [submenu] (Help) {}
+        [exec] (Info) { x-terminal-emulator -T "Info" -e info}
+    [end]
+    [submenu] (WindowManagers) {}
+        [restart] (FluxBox) {/usr/bin/fluxbox}
+    [end]
+    [config] (Configuration) {}
+    [submenu] (Styles) {}
+        [stylesdir] (/usr/share/fluxbox/styles) {}
+        [stylesdir] (~/.fluxbox/styles) {}
+    [end]
+    [workspaces] (Workspaces) {}
+    [reconfig] (Reconfigure) {}
+    [restart] (Restart) {}
+    [exit] (Exit) {}
+[end]

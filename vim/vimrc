@@ -1,0 +1,194 @@
+" An example for a vimrc file.
+"
+" Maintainer:	Bram Moolenaar <Bram@vim.org>
+" Last change:	2002 Sep 19
+"
+" To use it, copy it to
+"     for Unix and OS/2:  ~/.vimrc
+"	      for Amiga:  s:.vimrc
+"  for MS-DOS and Win32:  $VIM\_vimrc
+"	    for OpenVMS:  sys$login:.vimrc
+
+" When started as "evim", evim.vim will already have done these settings.
+if v:progname =~? "evim"
+  finish
+endif
+
+" Use Vim settings, rather then Vi settings (much better!).
+" This must be first, because it changes other options as a side effect.
+set nocompatible
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+if has("vms")
+  set nobackup		" do not keep a backup file, use versions instead
+else
+  set nobackup		" keep a backup file
+endif
+set history=50		" keep 50 lines of command line history
+set ruler		    " show the cursor position all the time
+set showcmd		    " display incomplete commands
+set incsearch		" do incremental searching
+set nu
+set autoindent
+
+"set expandtab
+"set softtabstop=4
+"set tabstop=4
+"set cindent shiftwidth=4
+
+set noexpandtab
+set tabstop=8
+set cindent shiftwidth=8
+
+set makeprg=php\ -l\ %
+set errorformat=%m\ in\ %f\ on\ line\ %l
+
+autocmd BufWinEnter *.c,*.h,*.S let w:m1=matchadd('Search', '\%<81v.\%>77v', -1)
+autocmd BufWinEnter *.c,*.h,*.S let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
+
+highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+match ExtraWhitespace /\s\+$/
+autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd BufWinLeave * call clearmatches()
+
+autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
+
+" colorscheme torte
+" colorscheme desert
+" colorscheme ron
+
+let g:miniBufExplMapWindowNavVim = 1
+let g:miniBufExplMapWindowNavArrows = 1
+let g:miniBufExplMapCTabSwitchBufs = 1
+let g:miniBufExplModSelTarget = 1
+"let g:miniBufExplMaxSize = 2
+
+nmap <silent> <F4>
+    \ :!ctags -f ./tags
+    \ --langmap="php:+.inc" --langmap="c:+.h"
+    \ -h ".php.inc.h" -R --totals=yes
+    \ --tag-relative=yes --PHP-kinds=+jicfv .<CR>
+set tags=./tags,tags
+
+let Tlist_Ctags_Cmd = "/usr/bin/ctags --language-force=C"
+let Tlist_Inc_Winwidth = 1
+let Tlist_Exit_OnlyWindow = 1
+let Tlist_File_Fold_Auto_Close = 1
+let Tlist_Process_File_Always = 1
+let Tlist_Enable_Fold_Column = 0
+let Tlist_Show_One_File = 1
+"let tlist_php_settings = 'php;c:class;d:constant;f:function'
+nnoremap <silent> <F8> :TlistToggle<CR>
+
+nnoremap <silent> P :Project<CR>
+nnoremap <silent> <C-F5> :!php %<CR>
+
+inoremap <C-P> <ESC>:call PhpDocSingle()<CR>i
+nnoremap <C-P> :call PhpDocSingle()<CR>
+vnoremap <C-P> :call PhpDocRange()<CR>
+
+imap <C-f> <C-x><C-o>
+if has("multi_byte")
+    set encoding=utf-8
+    set termencoding=utf-8
+    set formatoptions+=mM
+    set fencs=utf-8,gbk
+
+    if v:lang =~? '^\(zh\)\|\(ja\)\|\(ko\)'
+        set ambiwidth=double
+    endif
+
+    if has("win32")
+        source $VIMRUNTIME/delmenu.vim
+        source $VIMRUNTIME/menu.vim
+        language messages zh_CN.utf-8
+    endif
+else
+    echoerr "Sorry, this version of (g)vim was not compiled with +multi_byte"
+endif
+
+if has("gui_running")
+    set guioptions=
+    " colorscheme torte
+    "colorscheme desert
+    " colorscheme ron
+    " colorscheme default
+    set cursorline
+    if has("win32")
+        set guifont=Courier_New:h11:cANSI
+        "set gfn=Raize
+        au GUIEnter * simalt ~x
+    else
+        "set guifont=Courier\ 10\ Pitch\ 11
+        "set guifontwide=WenQuanYi\ Bitmap\ Song\ 11
+        set guifont=Courier\ 10\ Pitch\ 10
+        "set guifont=WenQuanYi\ Micro\ Hei\ Mono\ 10
+        set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 10
+    endif
+else
+    set t_Co=256
+    "colorscheme default
+    "colorscheme desert
+    "colorscheme torte
+    "colorscheme calmar256-dark
+    "colorscheme zenburn
+    colorscheme desertEx
+    "colorscheme gentooish
+endif
+
+" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
+" let &guioptions = substitute(&guioptions, "t", "", "g")
+
+" Don't use Ex mode, use Q for formatting
+map Q gq
+
+" This is an alternative that also works in block mode, but the deleted
+" text is lost and it only works for putting the current register.
+"vnoremap p "_dp
+
+" Switch syntax highlighting on, when the terminal has colors
+" Also switch on highlighting the last used search pattern.
+if &t_Co > 2 || has("gui_running")
+  syntax on
+  set hlsearch
+endif
+
+" Only do this part when compiled with support for autocommands.
+if has("autocmd")
+
+  " Enable file type detection.
+  " Use the default filetype settings, so that mail gets 'tw' set to 72,
+  " 'cindent' is on in C files, etc.
+  " Also load indent files, to automatically do language-dependent indenting.
+  filetype plugin indent on
+
+  " Put these in an autocmd group, so that we can delete them easily.
+  augroup vimrcEx
+  au!
+
+  " For all text files set 'textwidth' to 78 characters.
+  autocmd FileType text setlocal textwidth=78
+
+  " When editing a file, always jump to the last known cursor position.
+  " Don't do it when the position is invalid or when inside an event handler
+  " (happens when dropping a file on gvim).
+  autocmd BufReadPost *
+    \ if line("'\"") > 0 && line("'\"") <= line("$") |
+    \   exe "normal g`\"" |
+    \ endif
+
+  augroup END
+
+else
+
+  set autoindent		" always set autoindenting on
+
+endif " has("autocmd")
+
+set noai
+
+autocmd Filetype gitcommit setlocal spell spelllang=en_us
