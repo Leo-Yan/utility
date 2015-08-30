@@ -4,7 +4,7 @@ BASELN=/home/leoy/Work/tools/tunning/easv5/round2/result_mainline_0826
 EASDIS=/home/leoy/Work/tools/tunning/easv5/round2/result_eas_dis_0826
 EASNDM=/home/leoy/Work/tools/tunning/easv5/round2/result_eas_ndm_0826
 EASHED=/home/leoy/Work/tools/tunning/easv5/round2/result_eas_sched_0826
-RESULT=/home/leoy/Work/tools/tunning/easv5/round2/parse
+RESULT=/home/leoy/Work/tools/tunning/easv5/round2/utility/profile_eas/hikey_easv5_round2
 
 compare_trace_file()
 {
