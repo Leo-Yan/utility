@@ -1,8 +1,8 @@
 set terminal pngcairo noenhanced size 1024,600 font 'Ubuntu,9'
 set output sprintf('%s.png', filename)
 set grid
-set title "Power Data For Fixed CPUs and OPP"
-set ylabel "Power [mW]"
+set title "EAS Performance and Power Comparision"
+set ylabel "Performance and Power Result"
 
 set boxwidth 0.9 absolute
 set style fill   solid 1.00 border lt -1
@@ -25,7 +25,7 @@ set style line 7 lc rgb 'brown';
 set style line 8 lc rgb 'yellow';
 set style line 9 lc rgb 'red';
 
-plot for [i=2:10] 'recentfling' using i:xtic(1) ti col ls i-1;
+plot for [i=2:10] filename using i:xtic(1) ti col ls i-1;
 
 set terminal wxt noenhanced font 'Ubuntu,9'
 replot
