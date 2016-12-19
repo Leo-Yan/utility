@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!-- saved from url=(0182)https://s0.2mdn.net/5780116/1478713561428/300x250_VZW_OTT_ORIGINAL_CONTENT_MSBP_MAU_NEW_NA_OLA_HTML5_MSBP_MAU/300x250_VZW_OTT_ORIGINAL_CONTENT_MSBP_MAU_NEW_NA_OLA_HTML5_MSBP_MAU.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		
+		<title>Banner</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<meta name="ad.size" content="width=300,height=250">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+		<link rel="stylesheet" href="./main(1).css">
+	<script type="text/javascript">
+    
+      (function() {
+        var relegateNavigation = '';
+        var handleClickTagMessage = function(e) {
+          try {
+            var eventData = JSON.parse(e.data);
+          } catch (err) {
+            return;
+          }
+          if (eventData.isInitClickTag) {
+            if (eventData.clickTags) {
+              for (var i = 0; i < eventData.clickTags.length; i++) {
+                var clkTag = eventData.clickTags[i];
+                window[clkTag.name] = clkTag.url;
+              }
+            } else if (eventData.clickTag) {
+              window.clickTag = eventData.clickTag;
+            }
+            relegateNavigation = eventData.relegateNavigation;
+          }
+        };
+
+        if (open.call) {
+          window.open = function(open) {
+            return function(url, name, features) {
+              if (relegateNavigation === 'parent') {
+                var message = {'clickTag': url, 'isPostClickTag': true};
+                parent.postMessage(JSON.stringify(message), '*');
+              } else {
+                var args = [url, name];
+                if (features) {
+                  args.push(features);
+                }
+                open.apply(window, args);
+              }
+            };
+          }(window.open);
+        }
+
+        if (window.addEventListener) {
+          window.addEventListener(
+              'message', handleClickTagMessage, false);
+        } else {
+          window.attachEvent('onmessage', handleClickTagMessage);
+        }
+      })();
+    
+  </script></head>
+
+	<body>
+		<script>
+			var clickTag = 'http://verizon.com';
+		</script>
+		<div id="ad_content">
+			<div id="background_1" class="background_1" style="visibility: hidden; opacity: 0;"></div>
+			<div id="text_1" class="sprite text_1 visibility-off" style="visibility: hidden; opacity: 0;"></div>
+			<div id="background_2" class="background_2 visibility-off" style="visibility: hidden; opacity: 0;"></div>
+			<div id="text_2" class="sprite text_2 visibility-off" style="visibility: hidden; opacity: 0;"></div>
+			<div id="background_f3" class="visibility-off" style="visibility: hidden; opacity: 0;"></div>
+			<div id="new_form" class="sprite new_form visibility-off" style="visibility: hidden; opacity: 0;"></div>
+			<div id="president_logo" class="sprite president_logo visibility-off" style="visibility: hidden; opacity: 0;"></div>
+			<div id="slogan" class="sprite slogan visibility-off" style="visibility: hidden; opacity: 0;"></div>
+			<div id="text_ef" class="sprite text_ef visibility-off" style="visibility: inherit; opacity: 1;"></div>
+			<div id="go90" class="sprite go90 visibility-off" style="visibility: inherit; opacity: 1; transform: matrix(1, 0, 0, 1, 0, 0);"></div>
+			<div id="web" class="sprite web visibility-off" style="visibility: inherit; opacity: 1;"></div>
+			<div id="app_store" class="sprite app_store visibility-off" style="visibility: inherit; opacity: 1;"></div>
+			<div id="play_store" class="sprite play_store visibility-off" style="visibility: inherit; opacity: 1;"></div>
+		</div>
+		<!-- Load scripts -->
+		<script src="./TweenMax.min.js"></script>
+		<script src="./main(2).js"></script>
+	
+</body></html>
