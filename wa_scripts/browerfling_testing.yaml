@@ -1,0 +1,12 @@
+config:
+  instrumentation: [fps, ~trace-cmd]
+  trace-cmd:
+    buffer_size: 80000
+  trace_events: ['sched*', 'ipi*']
+  result_processors:
+    - summary_csv
+global: 
+  iterations: 1
+workloads: 
+  - browserfling
+

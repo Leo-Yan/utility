@@ -1,0 +1,17 @@
+config:
+  instrumentation: [energy_probe_ext, fps, ~trace-cmd]
+  energy_probe_ext:
+    config: '/home/leoy/Work/disk/tools/x86/arm-probe/config'
+  trace-cmd:
+    buffer_size: 80000
+  trace_events: ['sched*', 'ipi*']
+  result_processors:
+    - json
+    - summary_csv
+global: 
+  iterations: 1
+workloads: 
+  - galleryfling
+  - browserfling
+  - recentfling
+

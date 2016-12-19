@@ -1,0 +1,29 @@
+config:
+  instrumentation: [trace-cmd, hwmon]
+  trace-cmd:
+    buffer_size: 120000
+  trace_events: ['sched*', 'ipi*', 'cpu_frequency', 'cpu_capacity']
+  result_processors:
+    - summary_csv
+
+global:
+  iterations: 1
+  runtime_params:
+    sysfile_values:
+      /dev/cpuset/background/cpus: 0-5
+      /dev/cpuset/foreground/boost/cpus: 0-5
+      /dev/cpuset/foreground/cpus: 0-5
+      /dev/cpuset/system-background/cpus: 0-5
+      /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load: 85
+      /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq: 800000
+      /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor: interactive
+      /sys/devices/system/cpu/cpu1/cpufreq/interactive/go_hispeed_load: 85
+      /sys/devices/system/cpu/cpu1/cpufreq/interactive/hispeed_freq: 1100000
+      /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor: interactive
+
+workloads:
+  - name: rt_app
+    params:
+      config: /home/leoy/Work/tools/workload-automation/wlauto/workloads/rt_app/use_cases/camera-long.json
+      duration: 10
+

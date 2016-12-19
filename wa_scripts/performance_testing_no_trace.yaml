@@ -1,0 +1,8 @@
+config:
+        instrumentation: [~trace-cmd, ~execution_time, ~cpufreq]
+        result_processors: [json]
+        trace_events: ['sched*']
+global:
+        iterations: 1
+workloads:
+        - geekbench

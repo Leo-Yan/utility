@@ -1,0 +1,12 @@
+config:
+        instrumentation: [~execution_time, trace-cmd, juno_energy]
+        result_processors: [json]
+        trace_events: ['sched*']
+global:
+        iterations: 2
+workloads:
+        - memcpy
+        - name: dhrystone
+          params:
+                mloops: 5
+                threads: 1

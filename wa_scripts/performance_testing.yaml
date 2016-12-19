@@ -1,0 +1,11 @@
+config:
+        instrumentation: [trace-cmd, juno_energy]
+        trace-cmd:
+                buffer_size: 8000
+                mode: 'record'
+        result_processors: [json]
+        trace_events: ['sched*', 'ipi*']
+global:
+        iterations: 1
+workloads:
+        - geekbench
