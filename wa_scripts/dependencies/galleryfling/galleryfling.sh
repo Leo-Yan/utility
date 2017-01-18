@@ -48,11 +48,11 @@ case $DEVICE in
 	LEFT="300 400 1000 400 $flingtime"
 	SELECT="1000 600";;
 (juno)
-	flingtime=120
+	flingtime=100
 	rightCount=1
 	leftCount=1
-	RIGHT="1000 400 400 400 $flingtime"
-	LEFT="400 400 1000 400 $flingtime"
+	RIGHT="1200 400 400 400 $flingtime"
+	LEFT="300 400 1100 400 $flingtime"
 	SELECT="640 300";;
 (*)
 	echo "Error: No display information available for $DEVICE"

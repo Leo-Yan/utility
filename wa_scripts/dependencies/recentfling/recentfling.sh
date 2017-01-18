@@ -63,11 +63,11 @@ case $DEVICE in
 	UP="70 400 70 70 $flingtime"
 	DOWN="70 70 70 400 $flingtime";;
 (juno)
-	flingtime=150
-	downCount=1
-	upCount=1
-	UP="270 600 270 200 $flingtime"
-	DOWN="270 200 270 600 $flingtime";;
+        flingtime=100
+        downCount=1
+        upCount=1
+        UP="650 600 650 200 $flingtime"
+        DOWN="650 200 650 600 $flingtime";;
 (*)
 	echo "Error: No display information available for $DEVICE"
 	exit 1;;
@@ -102,6 +102,8 @@ latency99Sum=0
 
 echo Fling recents...
 doKeyevent HOME
+sleep 0.5
+swipe "$UP" $upCount
 sleep 0.5
 resetJankyFrames
 

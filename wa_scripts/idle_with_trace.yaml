@@ -1,0 +1,22 @@
+config:
+  instrumentation: [trace-cmd, hwmon]
+  trace-cmd:
+    buffer_size: 120000
+  trace_events: ['sched*', 'ipi*', 'cpu_frequency', 'cpu_capacity']
+  result_processors:
+    - summary_csv
+
+global:
+  iterations: 1
+  runtime_params:
+    sysfile_values:
+      /dev/cpuset/background/cpus: 0-5
+      /dev/cpuset/foreground/boost/cpus: 0-5
+      /dev/cpuset/foreground/cpus: 0-5
+      /dev/cpuset/system-background/cpus: 0-5
+      /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor: sched
+      /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor: sched
+
+workloads:
+  - name: idle
+

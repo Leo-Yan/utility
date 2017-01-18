@@ -2,7 +2,7 @@ config:
   instrumentation: [hwmon, trace-cmd]
   trace-cmd:
     buffer_size: 80000
-  trace_events: ['sched*', 'ipi*']
+  trace_events: ['sched*', 'ipi*', 'walt*']
   result_processors:
     - summary_csv
 global: 
@@ -20,5 +20,5 @@ global:
       /sys/devices/system/cpu/cpu1/cpufreq/interactive/go_hispeed_load: 85
       /sys/devices/system/cpu/cpu1/cpufreq/interactive/hispeed_freq: 800000
 workloads: 
-  - browserfling
+  - recentfling
 

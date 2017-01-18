@@ -25,7 +25,7 @@ set style line 7 lc rgb 'brown';
 set style line 8 lc rgb 'yellow';
 set style line 9 lc rgb 'red';
 
-plot for [i=2:10] filename using i:xtic(1) ti col ls i-1;
+plot for [i=2:11] filename using i:xtic(1) ti col ls i-1;
 
 set terminal wxt noenhanced font 'Ubuntu,9'
 replot
