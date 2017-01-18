@@ -12,13 +12,29 @@ from collections import defaultdict
 
 scenarios = {
 
+    'idle' : [
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
+    ],
+
+    'audio' : [
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
+    ],
+
+    'video' : [
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
+    ],
+
     'recentfling' : [
         'Average 90th Percentile',
         'Average 95th Percentile',
         'Average 99th Percentile',
         'Average Jank',
         'Average Jank%',
-        'Total energy'
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
     ],
 
     'galleryfling' : [
@@ -27,7 +43,8 @@ scenarios = {
         'Average 99th Percentile',
         'Average Jank',
         'Average Jank%',
-        'Total energy'
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
     ],
 
     'browserfling' : [
@@ -36,14 +53,17 @@ scenarios = {
         'Average 99th Percentile',
         'Average Jank',
         'Average Jank%',
-        'Total energy'
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
     ],
 
 
     'linpack' : [
         'Linpack ST',
-        'Linpack ST',
-        'Total energy'
+        'Linpack MT',
+        'Total energy',
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
     ],
 
     'quadrant' : [
@@ -60,12 +80,68 @@ scenarios = {
     'geekbench' : [
         'score',
         'multicore_score',
-        'Total energy'
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
     ],
 
     'nenamark' : [
         'nenamark score',
         'Total energy'
+    ],
+
+    'vellamo_overall' : [
+        'Browser',
+        'Multicore',
+        'Metal',
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
+    ],
+
+    'vellamo_Browser' : [
+        'Browser',
+        'html5.Crossfader',
+        'html5.Kruptein',
+        'html5.CanvasRefocus',
+        'html5.PixelBlender',
+        'html5.CanvasAquarium',
+        'html5.CSS3DFish',
+        'html5.Jellyfish',
+        'html5.DOMTraversal',
+        'html5.JSBandwidth',
+        'html5.CanvasRotate',
+        'html5.OceanScroller',
+        'html5.PageLoadPerformance',
+        'html5.TextReflow',
+        'html5.SunSpider',
+        'html5.Octane',
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
+    ],
+
+    'vellamo_Multicore' : [
+        'Multicore',
+        'multi.Linpack',
+        'multi.LinpackJava',
+        'multi.Stream',
+        'multi.Membench',
+        'multi.Sysbench',
+        'multi.Threadbench',
+        'multi.Parsec',
+        'multi.ProcessCommunication',
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
+    ],
+
+    'vellamo_Metal' : [
+        'Metal',
+        'metal.Dhrystone',
+        'metal.Linpack',
+        'metal.Kbench',
+        'metal.Stream',
+        'metal.RamJam',
+        'metal.FlashBench',
+        'BOARD_ENERGY_BIG',
+        'BOARD_ENERGY_LITTLE'
     ],
 
 }
@@ -89,7 +165,7 @@ def parse_file(scene, files):
             #print row[3]
             #print row[4]
 
-            if row[1] != scene:
+            if row[1] not in scene:
                 continue
 
             condition = row[3]
@@ -102,6 +178,13 @@ def parse_file(scene, files):
 
         if bool(collectValue) == False:
             break
+
+        for i in xrange(len(collectValue['BOARD_ENERGY_BIG'])):
+            collectValue['BOARD_ENERGY'].append(collectValue['BOARD_ENERGY_BIG'][i] + collectValue['BOARD_ENERGY_LITTLE'][i])
+
+        print collectValue['BOARD_ENERGY_BIG']
+        print collectValue['BOARD_ENERGY_LITTLE']
+        print collectValue['BOARD_ENERGY']
 
         # sort items
         collectValue = sorted(collectValue.items())
@@ -116,7 +199,9 @@ def parse_file(scene, files):
 
         out_file_tmp.write(name.split(os.path.sep)[0] + ' ')
         for condition, values in collectValue:
-            out_file_tmp.write(' ' + str(values[0]))
+            print condition
+            print values
+            out_file_tmp.write(' ' + str(sum(values) / len(values)))
         out_file_tmp.write('\n')
 
     out_file_tmp.close()
