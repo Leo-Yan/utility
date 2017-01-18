@@ -2,23 +2,25 @@ config:
   instrumentation: [hwmon, ~trace-cmd]
   trace-cmd:
     buffer_size: 80000
-  trace_events: ['sched*', 'ipi*']
+  trace_events: ['cpu_idle', 'cpu_capacity', 'cpu_frequency', 'sched_tune_config', 'sched_boost_cpu', 'sched_boost_task', 'sched_wakeup', 'sched_wakeup_new', 'sched_load_avg_cpu', 'sched_load_avg_task', 'sched_energy_diff', 'sched_contrib_scale_f', 'sched_switch', 'sched_migrate_task', 'sched_overutilized', 'irq_handler_entry', 'softirq_raise']
   result_processors:
     - summary_csv
-global: 
-  iterations: 3
-  runtime_params: 
-    sysfile_values: 
+
+global:
+  iterations: 5
+  runtime_params:
+    sysfile_values:
       /dev/cpuset/background/cpus: 0-5
       /dev/cpuset/foreground/boost/cpus: 0-5
       /dev/cpuset/foreground/cpus: 0-5
       /dev/cpuset/system-background/cpus: 0-5
-      /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor: interactive
       /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load: 85
       /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq: 700000
-      /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor: interactive
+      /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor: interactive
       /sys/devices/system/cpu/cpu1/cpufreq/interactive/go_hispeed_load: 85
       /sys/devices/system/cpu/cpu1/cpufreq/interactive/hispeed_freq: 800000
-workloads: 
-  - recentfling
+      /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor: interactive
+
+workloads:
+  - linpack
 

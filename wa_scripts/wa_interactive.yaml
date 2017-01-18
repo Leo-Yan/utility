@@ -1,12 +1,9 @@
 config:
-  instrumentation: [hwmon, trace-cmd]
-  trace-cmd:
-    buffer_size: 80000
-  trace_events: ['sched*', 'ipi*']
-  result_processors:
+  instrumentation: [hwmon]
+  result_processors: 
     - summary_csv
 global: 
-  iterations: 1
+  iterations: 5
   runtime_params: 
     sysfile_values: 
       /dev/cpuset/background/cpus: 0-5
@@ -19,6 +16,16 @@ global:
       /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor: interactive
       /sys/devices/system/cpu/cpu1/cpufreq/interactive/go_hispeed_load: 85
       /sys/devices/system/cpu/cpu1/cpufreq/interactive/hispeed_freq: 800000
-workloads: 
-  - browserfling
+workloads:
+  - name: idle
+  - name: audio
+  - name: video
+    params:
+      play_duration: 60
+      resolution: 1080p
+  - name: geekbench
+  - name: vellamo
+  - name: recentfling
+  - name: galleryfling
+  - name: browserfling
 
