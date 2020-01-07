@@ -1,7 +1,7 @@
 #!/bin/bash
 
-src_repo=/home/leoy/Work/disk/eas/andriod-aosp
-src_base=b92472cd7902f045b6732b03162fd640bcd5c076
+src_repo=/home/leoy/Work2/Develop/SE/LCE2/u-boot-linaro-lces2
+src_base=a705ebc81b7f91bbd0ef7c634284208342901149
 
 if [ -e /tmp/sync_repo ]; then
 	echo "It's syncing?!"
@@ -20,9 +20,9 @@ pushd /tmp/sync_repo/src
 
 for i in $(ls)
 do
-	cat $i 2> /dev/null | grep -e "kernel/sched" -e "include/linux/sched.h" -e "arch/arm/kernel/topology.c" \
-		-e "arch/arm64/kernel/topology.c" -e "Morten Rasmussen" -e "Juri Lelli" -e "Patrick Bellasi" \
-		-e "Robin Randhawa"  -e "Chris Redpath" -e "Vincent Guittot" -e "Steve Muckle" > /dev/null 2>&1
+	cat $i 2> /dev/null | grep -e "dfu" -e "DFU" -e "usb" \
+		-e "USB" > /dev/null 2>&1
+
 	#echo $?
 	STATUS=$?
 	if [ $STATUS -eq 0 ] ; then
