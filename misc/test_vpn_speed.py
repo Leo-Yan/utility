@@ -1,8 +1,10 @@
 import subprocess
 import re
 from collections import defaultdict
+import sys, getopt
 
-sites = [
+
+ssites = [
         'j0.0bad.com',
         'j1.0bad.com',
         'j2.0bad.com',
@@ -24,6 +26,24 @@ sites = [
         'us9.0bad.com',
         'uk.0bad.com',
         'in.0bad.com'
+]
+
+vsites = [
+        'v1.0bad.com',
+        'v2.0bad.com',
+        'v3.0bad.com',
+        'v4.0bad.com',
+        'v5.0bad.com',
+        'v6.0bad.com',
+        'v7.0bad.com',
+        'v8.0bad.com',
+        'v9.0bad.com',
+        'v10.0bad.com',
+        'v11.0bad.com',
+        'v12.0bad.com',
+        'v13.0bad.com',
+        'v14.0bad.com',
+        'v15.0bad.com',
 ]
 
 def test_site_speed(vpn_site):
@@ -58,7 +78,22 @@ def test_site_speed(vpn_site):
     speed = (10000 / float(avg)) * (100 - float(percent)) / 100
     return speed
 
-def main():
+def main(argv):
+
+    try:
+        opts, args = getopt.getopt(argv,"hvsd:",)
+    except getopt.GetoptError:
+        print 'test_vpn_speed.py -v (for v2ray test) or -s (for SS test)'
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt == '-h':
+            print 'test_vpn_speed.py -v (for v2ray test) or -s (for SS test)'
+            sys.exit()
+        elif opt == '-v':
+            sites = vsites
+        elif opt == '-s':
+            sites = ssites
 
     collectValue = defaultdict(list)
 
@@ -73,4 +108,4 @@ def main():
         print values
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
