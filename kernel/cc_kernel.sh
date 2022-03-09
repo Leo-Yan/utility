@@ -88,6 +88,32 @@ case "$PLAT" in
 	./scripts/config --file $OUT/.config -e CONFIG_USB_USBNET
 	./scripts/config --file $OUT/.config -e CONFIG_USB_NET_AX8817X
 	./scripts/config --file $OUT/.config -e CONFIG_USB_NET_AX88179_178A
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_SYSCALL
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
+	./scripts/config --file $OUT/.config -e CONFIG_TRACEPOINTS
+	./scripts/config --file $OUT/.config -e CONFIG_KPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_UPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_KRETPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_PROC_KCORE
+	./scripts/config --file $OUT/.config -e CONFIG_NOP_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_TRACER_MAX_TRACE
+	./scripts/config --file $OUT/.config -e CONFIG_RING_BUFFER
+	./scripts/config --file $OUT/.config -e CONFIG_EVENT_TRACING
+	./scripts/config --file $OUT/.config -e CONFIG_CONTEXT_SWITCH_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_TRACING
+	./scripts/config --file $OUT/.config -e CONFIG_GENERIC_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FTRACE
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_GRAPH_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_SCHED_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FTRACE_SYSCALLS
+	./scripts/config --file $OUT/.config -e CONFIG_TRACER_SNAPSHOT
+	./scripts/config --file $OUT/.config -e CONFIG_KPROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_UPROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
 	yes "" | make oldconfig O=$OUT
 	popd
 
