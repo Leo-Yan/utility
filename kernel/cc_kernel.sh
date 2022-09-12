@@ -2,11 +2,11 @@
 
 KERNEL=$1
 PLAT=$2
-OUT="${KERNEL}/${PLAT}_out"
+OUT="$PWD/${PLAT}_out"
 
 if [[ $# -ne 2 ]] ; then
 	echo "Usage: cc_kernel.sh kernel_path platform"
-	echo "       Supoorted platform: hikey960, db410c"
+	echo "       Supoorted platform: hikey960, db410c, t2, juno"
 	exit 1
 fi
 
@@ -18,11 +18,12 @@ fi
 function build_kernel_images {
 	pushd $KERNEL
 
-	make -j `nproc` $TARGET $DTB modules O=$OUT
+	#make -j `nproc` C=1 CHECK="/home/leoy/Work2/tools/smatch/smatch -p=kernel" $TARGET $DTB O=$OUT
+	make -j `nproc` $TARGET $DTB O=$OUT
 
-	rm -rf $OUT/modules
-	make -j `nproc` O=$OUT INSTALL_MOD_PATH=$OUT/overlay INSTALL_MOD_STRIP=1 modules_install
-	tar --owner root:0 --group root:0 -C $OUT/overlay -cf $OUT/overlay.tgz .
+	#make -j `nproc` modules O=$OUT
+	#make -j `nproc` O=$OUT INSTALL_MOD_PATH=$OUT/overlay INSTALL_MOD_STRIP=1 modules_install
+	#tar --owner root:0 --group root:0 -C $OUT/overlay -cf $OUT/overlay.tgz .
 
 	IMAGE_FILE=$OUT/arch/$ARCH/boot/$TARGET
 	DTB_FILE=$OUT/arch/$ARCH/boot/dts/$DTB
@@ -54,10 +55,11 @@ function build_abootimg {
 			-c pagesize=2048 -c kerneladdr=0x80008000 -c ramdiskaddr=0x81000000 \
 			-c cmdline="root=/dev/mmcblk0p14 rw rootwait console=tty0 console=ttyMSM0,115200n8 fastboot crashkernel=256M crash_kexec_post_notifiers nohlt"
 		;;
-
+	"t2")
+		cat $IMAGE_FILE $DTB_FILE > $OUT/Image.gz-dtb
+		;;
 	* )
-		echo "can't build for $PLAT, wrong platform name?"
-		exit
+		echo "Don't build abootimg for $PLAT"
 		;;
 	esac
 }
@@ -67,7 +69,7 @@ function copy_images {
 		cp_to_dbg_machine $IMAGE_FILE
 		cp_to_dbg_machine $DTB_FILE
 		cp_to_dbg_machine $OUT/boot.img
-		cp_to_dbg_machine $OUT/overlay.tgz
+		#cp_to_dbg_machine $OUT/overlay.tgz
 	fi
 }
 
@@ -142,6 +144,11 @@ case "$PLAT" in
 	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_EVENTS
 	./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
 	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
+	./scripts/config --file $OUT/.config -e CONFIG_INTERCONNECT_QCOM_MSM8939
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_BTF
+	./scripts/config --file $OUT/.config -d CONFIG_DEBUG_INFO_REDUCED
 	yes "" | make oldconfig O=$OUT
 	popd
 
@@ -211,6 +218,80 @@ case "$PLAT" in
 	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_EVENTS
 	./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
 	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
+	yes "" | make oldconfig O=$OUT
+	#make allyesconfig O=$OUT
+	popd
+
+	;;
+
+"t2")
+	export ARCH=arm64
+	export CROSS_COMPILE=aarch64-linux-gnu-
+	export TARGET=Image.gz
+	export DTB=qcom/apq8039-t2.dtb
+	export KERNEL_CONFIG=square_defconfig
+
+	pushd $KERNEL
+	make $KERNEL_CONFIG O=$OUT
+	yes "" | make oldconfig O=$OUT
+	popd
+
+	;;
+
+"juno")
+	export ARCH=arm64
+	export CROSS_COMPILE=aarch64-linux-gnu-
+	export TARGET=Image
+	export DTB=arm/juno-r2.dtb
+	export KERNEL_CONFIG=defconfig
+	export ABOOTIMG=boot.img
+	export COPYIMAGE=1
+
+	pushd $KERNEL
+	make $KERNEL_CONFIG O=$OUT
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_SYSCALL
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
+	./scripts/config --file $OUT/.config -e CONFIG_TRACEPOINTS
+	./scripts/config --file $OUT/.config -e CONFIG_KPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_UPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_KRETPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_PROC_KCORE
+	./scripts/config --file $OUT/.config -e CONFIG_NOP_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_TRACER_MAX_TRACE
+	./scripts/config --file $OUT/.config -e CONFIG_RING_BUFFER
+	./scripts/config --file $OUT/.config -e CONFIG_EVENT_TRACING
+	./scripts/config --file $OUT/.config -e CONFIG_CONTEXT_SWITCH_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_TRACING
+	./scripts/config --file $OUT/.config -e CONFIG_GENERIC_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FTRACE
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_GRAPH_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_SCHED_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FTRACE_SYSCALLS
+	./scripts/config --file $OUT/.config -e CONFIG_TRACER_SNAPSHOT
+	./scripts/config --file $OUT/.config -e CONFIG_KPROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_UPROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
+	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINKS_AND_SINKS
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINK_AND_SINK_TMC
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CATU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_TPIU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_ETBV10
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM4X
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_STM
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CPU_DEBUG
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_BTF
+	./scripts/config --file $OUT/.config -d CONFIG_DEBUG_INFO_REDUCED
+
 	yes "" | make oldconfig O=$OUT
 	#make allyesconfig O=$OUT
 	popd
