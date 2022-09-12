@@ -4,6 +4,7 @@ set grid
 set title "EAS Performance and Power Comparision"
 set ylabel "Performance and Power Result"
 
+set yrange [0:100]
 set boxwidth 0.9 absolute
 set style fill   solid 1.00 border lt -1
 set key outside right
@@ -25,7 +26,7 @@ set style line 7 lc rgb 'brown';
 set style line 8 lc rgb 'yellow';
 set style line 9 lc rgb 'red';
 
-plot for [i=2:11] filename using i:xtic(1) ti col ls i-1;
+plot for [i=2:5] filename using i:xtic(1) ti col ls i-1;
 
 set terminal wxt noenhanced font 'Ubuntu,9'
 replot
