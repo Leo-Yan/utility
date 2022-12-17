@@ -6,7 +6,7 @@ OUT="$PWD/${PLAT}_out"
 
 if [[ $# -ne 2 ]] ; then
 	echo "Usage: cc_kernel.sh kernel_path platform"
-	echo "       Supoorted platform: hikey960, db410c, t2, juno"
+	echo "       Supoorted platform: hikey960, db410c, t2, juno, ava"
 	exit 1
 fi
 
@@ -15,28 +15,36 @@ if [ ! -d $KERNEL ]; then
 	exit 1
 fi
 
+function build_kernel_static_check {
+	if [ -z ${STATIC_CHECK+x} ]; then
+		return
+	fi
+
+	pushd $KERNEL
+	# Static check
+	make -j `nproc` C=1 CHECK="/home/leoy/Work2/tools/smatch/smatch -p=kernel" $TARGET $DTB O=$OUT
+	popd
+
+	# Directly bail out
+	exit 1
+}
+
 function build_kernel_images {
 	pushd $KERNEL
 
-	#make -j `nproc` C=1 CHECK="/home/leoy/Work2/tools/smatch/smatch -p=kernel" $TARGET $DTB O=$OUT
 	make -j `nproc` $TARGET $DTB O=$OUT
-
-	#make -j `nproc` modules O=$OUT
-	#make -j `nproc` O=$OUT INSTALL_MOD_PATH=$OUT/overlay INSTALL_MOD_STRIP=1 modules_install
-	#tar --owner root:0 --group root:0 -C $OUT/overlay -cf $OUT/overlay.tgz .
-
-	IMAGE_FILE=$OUT/arch/$ARCH/boot/$TARGET
-	DTB_FILE=$OUT/arch/$ARCH/boot/dts/$DTB
-
-	if [ ! -f $IMAGE_FILE ]; then
+	if [ ! -f $OUT/arch/$ARCH/boot/$TARGET ]; then
 		echo "Fail to build $IMAGE_FILE"
 		exit 1
 	fi
-
-	if [ ! -f $DTB_FILE ]; then
+	if [ ! -f $OUT/arch/$ARCH/boot/dts/$DTB ]; then
 		echo "Fail to build $DTB_FILE"
 		exit 1
 	fi
+
+	make -j `nproc` modules O=$OUT
+	#make -j `nproc` O=$OUT INSTALL_MOD_PATH=$OUT/overlay INSTALL_MOD_STRIP=1 modules_install
+	#tar --owner root:0 --group root:0 -C $OUT/overlay -cf $OUT/overlay.tgz .
 
 	popd
 }
@@ -70,6 +78,13 @@ function copy_images {
 		cp_to_dbg_machine $DTB_FILE
 		cp_to_dbg_machine $OUT/boot.img
 		#cp_to_dbg_machine $OUT/overlay.tgz
+	fi
+
+	if [ ! -z ${INSTALLIMAGE+x} ]; then
+		pushd $KERNEL
+		sudo make modules_install O=$OUT
+		sudo make install O=$OUT
+		popd
 	fi
 }
 
@@ -298,12 +313,86 @@ case "$PLAT" in
 
 	;;
 
+"ava")
+	export ARCH=arm64
+	export CROSS_COMPILE=aarch64-linux-gnu-
+	export TARGET=Image
+	export DTB=arm/juno-r2.dtb
+	export KERNEL_CONFIG=defconfig
+	export INSTALLIMAGE=1
+
+	pushd $KERNEL
+	make $KERNEL_CONFIG O=$OUT
+	# Enable NVME drivers
+	./scripts/config --file $OUT/.config -e CONFIG_NVME_CORE
+	./scripts/config --file $OUT/.config -e CONFIG_BLK_DEV_NVME
+	./scripts/config --file $OUT/.config -e CONFIG_NVME_MULTIPATH
+
+	# Enable Device Mapper
+	./scripts/config --file $OUT/.config -e CONFIG_MD
+	./scripts/config --file $OUT/.config -e CONFIG_BLK_DEV_DM_BUILTIN
+	./scripts/config --file $OUT/.config -e CONFIG_BLK_DEV_DM
+
+	# Enable debugging options
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_SYSCALL
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
+	./scripts/config --file $OUT/.config -e CONFIG_TRACEPOINTS
+	./scripts/config --file $OUT/.config -e CONFIG_KPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_UPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_KRETPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_PROC_KCORE
+	./scripts/config --file $OUT/.config -e CONFIG_NOP_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_TRACER_MAX_TRACE
+	./scripts/config --file $OUT/.config -e CONFIG_RING_BUFFER
+	./scripts/config --file $OUT/.config -e CONFIG_EVENT_TRACING
+	./scripts/config --file $OUT/.config -e CONFIG_CONTEXT_SWITCH_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_TRACING
+	./scripts/config --file $OUT/.config -e CONFIG_GENERIC_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FTRACE
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_GRAPH_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_SCHED_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FTRACE_SYSCALLS
+	./scripts/config --file $OUT/.config -e CONFIG_TRACER_SNAPSHOT
+	./scripts/config --file $OUT/.config -e CONFIG_KPROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_UPROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
+	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINKS_AND_SINKS
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINK_AND_SINK_TMC
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CATU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_TPIU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_ETBV10
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM4X
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_STM
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CPU_DEBUG
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_BTF
+	./scripts/config --file $OUT/.config -d CONFIG_DEBUG_INFO_REDUCED
+
+	./scripts/config --file $OUT/.config -e CONFIG_ARM_SPE_PMU
+	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	./scripts/config --file $OUT/.config -e CONFIG_MEMORY_HOTPLUG
+
+	yes "" | make oldconfig O=$OUT
+	popd
+
+	;;
+
 * )
 	echo "can't build for $PLAT, wrong platform name?"
 	exit
 	;;
 esac
 
+build_kernel_static_check
 build_kernel_images
 build_abootimg
 copy_images
