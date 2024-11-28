@@ -6,7 +6,7 @@ OUT="$PWD/${PLAT}_out"
 
 if [[ $# -ne 2 ]] ; then
 	echo "Usage: cc_kernel.sh kernel_path platform"
-	echo "       Supoorted platform: hikey960, db410c, t2, juno, ava"
+	echo "       Supoorted platform: hikey960, db410c, t2, juno, ava, tc"
 	exit 1
 fi
 
@@ -446,6 +446,89 @@ case "$PLAT" in
 
 	;;
 
+"tc")
+	export ARCH=arm64
+	export CROSS_COMPILE=aarch64-linux-gnu-
+	export TARGET=Image
+	export DTB=arm/juno-r2.dtb
+	export KERNEL_CONFIG=defconfig
+
+	pushd $KERNEL
+	make $KERNEL_CONFIG O=$OUT
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_SYSCALL
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
+	./scripts/config --file $OUT/.config -e CONFIG_TRACEPOINTS
+	./scripts/config --file $OUT/.config -e CONFIG_KPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_UPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_KRETPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_PROC_KCORE
+	./scripts/config --file $OUT/.config -e CONFIG_NOP_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_TRACER_MAX_TRACE
+	./scripts/config --file $OUT/.config -e CONFIG_RING_BUFFER
+	./scripts/config --file $OUT/.config -e CONFIG_EVENT_TRACING
+	./scripts/config --file $OUT/.config -e CONFIG_CONTEXT_SWITCH_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_TRACING
+	./scripts/config --file $OUT/.config -e CONFIG_GENERIC_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FTRACE
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_GRAPH_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_SCHED_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FTRACE_SYSCALLS
+	./scripts/config --file $OUT/.config -e CONFIG_TRACER_SNAPSHOT
+	./scripts/config --file $OUT/.config -e CONFIG_KPROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_UPROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
+	./scripts/config --file $OUT/.config -e CONFIG_FPROBE
+	./scripts/config --file $OUT/.config -e CONFIG_FPROBE_EVENTS
+	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINKS_AND_SINKS
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINK_AND_SINK_TMC
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CATU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_TPIU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_ETBV10
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM4X
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_STM
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CPU_DEBUG
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TRBE
+	./scripts/config --file $OUT/.config -e CONFIG_ARM_DSU_PMU
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_BTF
+	./scripts/config --file $OUT/.config -d CONFIG_DEBUG_INFO_REDUCED
+	./scripts/config --file $OUT/.config -e CONFIG_MODULE_ALLOW_BTF_MISMATCH
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_FS
+	./scripts/config --file $OUT/.config -e CONFIG_SCSI_VIRTIO
+	./scripts/config --file $OUT/.config -e CONFIG_I2C_VIRTIO
+	./scripts/config --file $OUT/.config -e CONFIG_GPIO_VIRTIO
+	./scripts/config --file $OUT/.config -e CONFIG_SND_VIRTIO
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_INPUT
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_MEM
+	./scripts/config --file $OUT/.config -e CONFIG_MACVLAN
+	./scripts/config --file $OUT/.config -e CONFIG_MACVTAP
+	./scripts/config --file $OUT/.config -e CONFIG_VHOST_IOTLB
+	./scripts/config --file $OUT/.config -e CONFIG_VHOST
+	./scripts/config --file $OUT/.config -e CONFIG_VHOST_NET
+	./scripts/config --file $OUT/.config -e CONFIG_FUSE_FS
+
+	./scripts/config --file $OUT/.config -e CONFIG_ARM_SPE_PMU
+	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	./scripts/config --file $OUT/.config -e CONFIG_IPV6
+
+	./scripts/config --file $OUT/.config -d CONFIG_OID_REGISTRY
+	./scripts/config --file $OUT/.config -d CONFIG_CRYPTO
+
+	yes "" | make oldconfig O=$OUT
+	#make allyesconfig O=$OUT
+	popd
+
+	;;
+
 * )
 	echo "can't build for $PLAT, wrong platform name?"
 	exit
@@ -454,5 +537,5 @@ esac
 
 build_kernel_static_check
 build_kernel
-build_abootimg
-copy_images
+#build_abootimg
+#copy_images
