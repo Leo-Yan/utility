@@ -2,7 +2,8 @@
 
 KERNEL=$1
 PLAT=$2
-OUT="$PWD/${PLAT}_out"
+#OUT="$PWD/${PLAT}_out"
+OUT="/data_nvme1n1/niayan01/upstream/build/"
 
 if [[ $# -ne 2 ]] ; then
 	echo "Usage: cc_kernel.sh kernel_path platform"
@@ -44,9 +45,9 @@ function config_kernel {
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_BITMAIN
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_EXYNOS
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_SPARX5
-	#./scripts/config --file $OUT/.config -d CONFIG_ARCH_K3
+	./scripts/config --file $OUT/.config -d CONFIG_ARCH_K3
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_LG1K
-	#./scripts/config --file $OUT/.config -d CONFIG_ARCH_HISI
+	./scripts/config --file $OUT/.config -d CONFIG_ARCH_HISI
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_KEEMBAY
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_MEDIATEK
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_MESON
@@ -76,6 +77,7 @@ function config_kernel {
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_VISCONTI
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_XGENE
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_ZYNQMP
+
 	./scripts/config --file $OUT/.config -e CONFIG_BPF_SYSCALL
 	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
 	./scripts/config --file $OUT/.config -e CONFIG_TRACEPOINTS
@@ -107,21 +109,28 @@ function config_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_BTF
 	./scripts/config --file $OUT/.config -d CONFIG_DEBUG_INFO_REDUCED
 	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	./scripts/config --file $OUT/.config -e CONFIG_FPROBE
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINKS_AND_SINKS
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINK_AND_SINK_TMC
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CATU
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_TPIU
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_ETBV10
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM3X
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM4X
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_STM
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTCU
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CPU_DEBUG
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TRBE
 }
 
 function build_kernel {
 	pushd $KERNEL
 
 	make -j `nproc` $TARGET $DTB O=$OUT
+	make headers_install O=$OUT
 
  	IMAGE_FILE=$OUT/arch/$ARCH/boot/$TARGET
  	DTB_FILE=$OUT/arch/$ARCH/boot/dts/$DTB
@@ -210,9 +219,11 @@ case "$PLAT" in
 
 	pushd $KERNEL
 
+	# config_kernel
 	config_kernel
-	./scripts/config --file $OUT/.config -e CONFIG_ARCH_K3
 	./scripts/config --file $OUT/.config -e CONFIG_ARCH_HISI
+	./scripts/config --file $OUT/.config -e CONFIG_ARCH_VEXPRESS
+	./scripts/config --file $OUT/.config -e CONFIG_ARCH_XGENE
 	./scripts/config --file $OUT/.config -e CONFIG_PHY_HI3660_USB
 	./scripts/config --file $OUT/.config -e CONFIG_HISI_HIKEY_USB
 	./scripts/config --file $OUT/.config -e CONFIG_TYPEC
@@ -233,6 +244,79 @@ case "$PLAT" in
 	./scripts/config --file $OUT/.config -e CONFIG_USB_USBNET
 	./scripts/config --file $OUT/.config -e CONFIG_USB_NET_AX8817X
 	./scripts/config --file $OUT/.config -e CONFIG_USB_NET_AX88179_178A
+	./scripts/config --file $OUT/.config -e CONFIG_FUSE_FS
+
+	#./scripts/config --file $OUT/.config -e CONFIG_BPF_SYSCALL
+	#./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
+	#./scripts/config --file $OUT/.config -e CONFIG_TRACEPOINTS
+	#./scripts/config --file $OUT/.config -e CONFIG_KPROBES
+	#./scripts/config --file $OUT/.config -e CONFIG_UPROBES
+	#./scripts/config --file $OUT/.config -e CONFIG_KRETPROBES
+	#./scripts/config --file $OUT/.config -e CONFIG_PROC_KCORE
+	#./scripts/config --file $OUT/.config -e CONFIG_NOP_TRACER
+	#./scripts/config --file $OUT/.config -e CONFIG_TRACER_MAX_TRACE
+	#./scripts/config --file $OUT/.config -e CONFIG_RING_BUFFER
+	#./scripts/config --file $OUT/.config -e CONFIG_EVENT_TRACING
+	#./scripts/config --file $OUT/.config -e CONFIG_CONTEXT_SWITCH_TRACER
+	#./scripts/config --file $OUT/.config -e CONFIG_TRACING
+	#./scripts/config --file $OUT/.config -e CONFIG_GENERIC_TRACER
+	#./scripts/config --file $OUT/.config -e CONFIG_FTRACE
+	#./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_TRACER
+	#./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_GRAPH_TRACER
+	#./scripts/config --file $OUT/.config -e CONFIG_SCHED_TRACER
+	#./scripts/config --file $OUT/.config -e CONFIG_FTRACE_SYSCALLS
+	#./scripts/config --file $OUT/.config -e CONFIG_TRACER_SNAPSHOT
+	#./scripts/config --file $OUT/.config -e CONFIG_KPROBE_EVENTS
+	#./scripts/config --file $OUT/.config -e CONFIG_UPROBE_EVENTS
+	#./scripts/config --file $OUT/.config -e CONFIG_BPF_EVENTS
+	#./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_EVENTS
+	#./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
+	#./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
+	#./scripts/config --file $OUT/.config -e CONFIG_FPROBE
+	#./scripts/config --file $OUT/.config -e CONFIG_FPROBE_EVENTS
+	#./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINKS_AND_SINKS
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINK_AND_SINK_TMC
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CATU
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_TPIU
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_ETBV10
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM4X
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_STM
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CPU_DEBUG
+	##./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI
+	##./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TRBE
+	#./scripts/config --file $OUT/.config -e CONFIG_ARM_DSU_PMU
+	#./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
+	#./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
+	#./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_BTF
+	#./scripts/config --file $OUT/.config -d CONFIG_DEBUG_INFO_REDUCED
+	#./scripts/config --file $OUT/.config -e CONFIG_MODULE_ALLOW_BTF_MISMATCH
+	#./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_FS
+	#./scripts/config --file $OUT/.config -e CONFIG_SCSI_VIRTIO
+	#./scripts/config --file $OUT/.config -e CONFIG_I2C_VIRTIO
+	#./scripts/config --file $OUT/.config -e CONFIG_GPIO_VIRTIO
+	#./scripts/config --file $OUT/.config -e CONFIG_SND_VIRTIO
+	#./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_INPUT
+	#./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_MEM
+	#./scripts/config --file $OUT/.config -e CONFIG_MACVLAN
+	#./scripts/config --file $OUT/.config -e CONFIG_MACVTAP
+	#./scripts/config --file $OUT/.config -e CONFIG_VHOST_IOTLB
+	#./scripts/config --file $OUT/.config -e CONFIG_VHOST
+	#./scripts/config --file $OUT/.config -e CONFIG_VHOST_NET
+	#./scripts/config --file $OUT/.config -e CONFIG_FUSE_FS
+
+	./scripts/config --file $OUT/.config -e CONFIG_ARM_SPE_PMU
+	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	./scripts/config --file $OUT/.config -e CONFIG_IPV6
+
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
+	./scripts/config --file $OUT/.config -d CONFIG_DEBUG_INFO_REDUCED
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_BTF
+
+	./scripts/config --file $OUT/.config -e CONFIG_TEE
 
 	yes "" | make oldconfig O=$OUT
 
@@ -520,8 +604,16 @@ case "$PLAT" in
 	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
 	./scripts/config --file $OUT/.config -e CONFIG_IPV6
 
-	./scripts/config --file $OUT/.config -d CONFIG_OID_REGISTRY
-	./scripts/config --file $OUT/.config -d CONFIG_CRYPTO
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
+	./scripts/config --file $OUT/.config -d CONFIG_DEBUG_INFO_REDUCED
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_BTF
+
+	./scripts/config --file $OUT/.config -e CONFIG_TEE
+	#./scripts/config --file $OUT/.config -d CONFIG_OID_REGISTRY
+	#./scripts/config --file $OUT/.config -d CONFIG_CRYPTO
+
+	#cp /data_nvme1n1/niayan01/upstream/utility/kernel/config_test $OUT/.config
 
 	yes "" | make oldconfig O=$OUT
 	#make allyesconfig O=$OUT
@@ -537,5 +629,5 @@ esac
 
 build_kernel_static_check
 build_kernel
-#build_abootimg
+build_abootimg
 #copy_images
