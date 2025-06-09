@@ -1,5 +1,7 @@
 #!/usr/bin/bash
 
+set -e
+
 KERNEL=$1
 OUT=$2
 COPY_TGT=$3
@@ -110,6 +112,7 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
 	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
 	./scripts/config --file $OUT/.config -e CONFIG_FPROBE
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_LSM
 
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
@@ -149,6 +152,15 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_IPV6
 	./scripts/config --file $OUT/.config -e CONFIG_TEE
 	./scripts/config --file $OUT/.config -e CONFIG_FUSE_FS
+
+	./scripts/config --file $OUT/.config -e CONFIG_SECURITY_SELINUX
+	./scripts/config --file $OUT/.config -e CONFIG_SECURITY_NETWORK
+	./scripts/config --file $OUT/.config -e CONFIG_SECURITY_PATH
+	./scripts/config --file $OUT/.config -e CONFIG_SECURITY_APPARMOR
+
+	./scripts/config --file $OUT/.config -e CONFIG_LTO_CLANG_THIN
+	./scripts/config --file $OUT/.config -e CONFIG_LTO_CLANG
+	./scripts/config --file $OUT/.config -e CONFIG_LTO
 }
 
 function config_hikey960 {
@@ -232,7 +244,12 @@ function config_virt_device {
 
 function config_kernel {
 	pushd $KERNEL
-	make $KERNEL_CONFIG O=$OUT
+
+	if [ -n "$LLVM" ]; then
+		make LLVM=${LLVM} ARCH=arm64 $KERNEL_CONFIG O=$OUT
+	else
+		make ARCH=arm64 $KERNEL_CONFIG O=$OUT
+	fi
 
 	config_common_kernel
 	config_hikey960
@@ -241,7 +258,11 @@ function config_kernel {
 	config_block_device
 	config_virt_device
 
-	yes "" | make oldconfig O=$OUT
+	if [ -n "$LLVM" ]; then
+		yes "" | make LLVM=${LLVM} ARCH=arm64 oldconfig O=$OUT
+	else
+		yes "" | make ARCH=arm64 oldconfig O=$OUT
+	fi
 
 	popd
 }
@@ -249,8 +270,14 @@ function config_kernel {
 function build_kernel {
 	pushd $KERNEL
 
-	make -j `nproc` $TARGET $DTBS O=$OUT
-	make headers_install O=$OUT
+	#make ARCH=arm64 -j `nproc` $DTBS O=$OUT V=1
+	if [ -n "$LLVM" ]; then
+		make LLVM=${LLVM} ARCH=arm64 -j `nproc` $TARGET O=$OUT V=1
+		make LLVM=${LLVM} ARCH=arm64 headers_install O=$OUT
+	else
+		make ARCH=arm64 -j `nproc` $TARGET O=$OUT V=1
+		make ARCH=arm64 headers_install O=$OUT
+	fi
 
  	IMAGE_FILE=$OUT/arch/$ARCH/boot/$TARGET
 
