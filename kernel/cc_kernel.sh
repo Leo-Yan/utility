@@ -6,6 +6,8 @@ KERNEL=$1
 OUT=$2
 COPY_TGT=$3
 
+VERBOSE_LVL=${VERBOSE:-0}
+
 if [[ $# -lt 2 ]] ; then
 	echo "Usage: cc_kernel.sh kernel_dir build_dir [copy_addr]"
 	exit 1
@@ -28,8 +30,8 @@ function build_kernel_static_check {
 
 	pushd $KERNEL
 	# Static check
-	# make -j `nproc` C=1 CHECK="/data_nvme1n1/niayan01/tools/smatch/smatch -p=kernel" $TARGET O=$OUT
-	make -j `nproc` C=1 $TARGET O=$OUT
+	make -j `nproc` C=1 CHECK="/data_nvme1n1/niayan01/tools/smatch/smatch -p=kernel" $TARGET O=$OUT
+	#make -j `nproc` C=1 $TARGET O=$OUT
 	popd
 
 	# Directly bail out
@@ -139,6 +141,7 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TRBE
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TNOC
 
 	# Enable platform specific config
 	./scripts/config --file $OUT/.config -e CONFIG_ARCH_HISI
@@ -270,12 +273,14 @@ function config_kernel {
 function build_kernel {
 	pushd $KERNEL
 
-	#make ARCH=arm64 -j `nproc` $DTBS O=$OUT V=1
+	make ARCH=arm64 -j `nproc` $DTBS V=${VERBOSE_LVL} O=$OUT
+	# make CHECK_DTBS=y arm/fvp-base-revc.dtb O=$OUT
+
 	if [ -n "$LLVM" ]; then
-		make LLVM=${LLVM} ARCH=arm64 -j `nproc` $TARGET O=$OUT V=1
+		make LLVM=${LLVM} ARCH=arm64 -j `nproc` $TARGET V=${VERBOSE_LVL} O=$OUT
 		make LLVM=${LLVM} ARCH=arm64 headers_install O=$OUT
 	else
-		make ARCH=arm64 -j `nproc` $TARGET O=$OUT V=1
+		make ARCH=arm64 -j `nproc` $TARGET V=${VERBOSE_LVL} O=$OUT
 		make ARCH=arm64 headers_install O=$OUT
 	fi
 
@@ -331,6 +336,8 @@ function build_abootimg {
 }
 
 function copy_images {
+	cp $IMAGE_FILE /var/lib/tftpboot/
+
 	if [ -z "${COPY_TGT}" ]; then
 		return
 	fi
@@ -349,7 +356,7 @@ export ARCH=arm64
 export CROSS_COMPILE=aarch64-linux-gnu-
 export TARGET=Image
 export KERNEL_CONFIG=defconfig
-export DTBS="hisilicon/hi3660-hikey960.dtb qcom/apq8016-sbc.dtb arm/juno-r2.dtb"
+export DTBS="hisilicon/hi3660-hikey960.dtb qcom/apq8016-sbc.dtb arm/juno-r2.dtb arm/juno-r2-scmi.dtb arm/fvp-base-revc.dtb"
 
 # Hikey960
 # Generate config file and enable specific configurations
