@@ -6,7 +6,8 @@ KERNEL=$1
 OUT=$2
 COPY_TGT=$3
 
-VERBOSE_LVL=${VERBOSE:-0}
+: ${VERBOSE:=0}
+: ${ARCH:=arm64}
 
 if [[ $# -lt 2 ]] ; then
 	echo "Usage: cc_kernel.sh kernel_dir build_dir [copy_addr]"
@@ -38,7 +39,7 @@ function build_kernel_static_check {
 	exit 1
 }
 
-function config_common_kernel {
+function config_arm64_kernel {
 	# Disable irrelevant platforms
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_ACTIONS
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_SUNXI
@@ -86,6 +87,17 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_XGENE
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_ZYNQMP
 
+	# Enable platform specific config
+	./scripts/config --file $OUT/.config -e CONFIG_ARCH_HISI
+	./scripts/config --file $OUT/.config -e CONFIG_ARCH_VEXPRESS
+	./scripts/config --file $OUT/.config -e CONFIG_ARCH_XGENE
+	./scripts/config --file $OUT/.config -e CONFIG_ARCH_QCOM
+
+	# Enable Arm SPE
+	./scripts/config --file $OUT/.config -e CONFIG_ARM_SPE_PMU
+}
+
+function config_common_kernel {
 	# Enable debugging features
 	./scripts/config --file $OUT/.config -e CONFIG_BPF_SYSCALL
 	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
@@ -142,15 +154,7 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TRBE
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TNOC
-
-	# Enable platform specific config
-	./scripts/config --file $OUT/.config -e CONFIG_ARCH_HISI
-	./scripts/config --file $OUT/.config -e CONFIG_ARCH_VEXPRESS
-	./scripts/config --file $OUT/.config -e CONFIG_ARCH_XGENE
-	./scripts/config --file $OUT/.config -e CONFIG_ARCH_QCOM
-
-	# Enable Arm SPE
-	./scripts/config --file $OUT/.config -e CONFIG_ARM_SPE_PMU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_DUMMY
 
 	./scripts/config --file $OUT/.config -e CONFIG_IPV6
 	./scripts/config --file $OUT/.config -e CONFIG_TEE
@@ -249,22 +253,26 @@ function config_kernel {
 	pushd $KERNEL
 
 	if [ -n "$LLVM" ]; then
-		make LLVM=${LLVM} ARCH=arm64 $KERNEL_CONFIG O=$OUT
+		make LLVM=${LLVM} $KERNEL_CONFIG O=$OUT
 	else
-		make ARCH=arm64 $KERNEL_CONFIG O=$OUT
+		make $KERNEL_CONFIG O=$OUT
+	fi
+
+	if [[ "$ARCH" == "arm64" ]]; then
+		config_arm64_kernel
+		config_hikey960
+		#config_db410c
 	fi
 
 	config_common_kernel
-	config_hikey960
-	#config_db410c
 	config_network
 	config_block_device
 	config_virt_device
 
 	if [ -n "$LLVM" ]; then
-		yes "" | make LLVM=${LLVM} ARCH=arm64 oldconfig O=$OUT
+		yes "" | make LLVM=${LLVM} oldconfig O=$OUT
 	else
-		yes "" | make ARCH=arm64 oldconfig O=$OUT
+		yes "" | make oldconfig O=$OUT
 	fi
 
 	popd
@@ -273,15 +281,12 @@ function config_kernel {
 function build_kernel {
 	pushd $KERNEL
 
-	make ARCH=arm64 -j `nproc` $DTBS V=${VERBOSE_LVL} O=$OUT
-	# make CHECK_DTBS=y arm/fvp-base-revc.dtb O=$OUT
-
 	if [ -n "$LLVM" ]; then
-		make LLVM=${LLVM} ARCH=arm64 -j `nproc` $TARGET V=${VERBOSE_LVL} O=$OUT
-		make LLVM=${LLVM} ARCH=arm64 headers_install O=$OUT
+		make LLVM=${LLVM} -j `nproc` $TARGET V=${VERBOSE} O=$OUT
+		make LLVM=${LLVM} headers_install O=$OUT
 	else
-		make ARCH=arm64 -j `nproc` $TARGET V=${VERBOSE_LVL} O=$OUT
-		make ARCH=arm64 headers_install O=$OUT
+		make -j `nproc` $TARGET V=${VERBOSE} O=$OUT
+		make headers_install O=$OUT
 	fi
 
  	IMAGE_FILE=$OUT/arch/$ARCH/boot/$TARGET
@@ -289,6 +294,11 @@ function build_kernel {
 	if [ ! -f $IMAGE_FILE ]; then
 		echo "Fail to build $IMAGE_FILE"
 		exit 1
+	fi
+
+	if [[ ! -z "$DTBS" ]]; then
+		make -j `nproc` $DTBS V=${VERBOSE} O=$OUT
+		# make CHECK_DTBS=y arm/fvp-base-revc.dtb O=$OUT
 	fi
 
 	for f in $DTBS; do
@@ -352,11 +362,22 @@ echo "Building kernel $KERNEL ..."
 echo "Output folder is: $OUT"
 
 # Global variables for all platforms
-export ARCH=arm64
-export CROSS_COMPILE=aarch64-linux-gnu-
+if [[ "$ARCH" == "arm64" ]]; then
+	export CROSS_COMPILE=aarch64-linux-gnu-
+	export DTBS="hisilicon/hi3660-hikey960.dtb qcom/apq8016-sbc.dtb arm/juno-r2.dtb arm/juno-r2-scmi.dtb arm/fvp-base-revc.dtb"
+	export KERNEL_CONFIG=defconfig
+elif [[ "$ARCH" == "arm" ]]; then
+	export CROSS_COMPILE=arm-linux-gnueabi-
+	export DTBS=""
+	export KERNEL_CONFIG=u8500_defconfig
+fi
+
 export TARGET=Image
-export KERNEL_CONFIG=defconfig
-export DTBS="hisilicon/hi3660-hikey960.dtb qcom/apq8016-sbc.dtb arm/juno-r2.dtb arm/juno-r2-scmi.dtb arm/fvp-base-revc.dtb"
+
+echo "Architecture: ${ARCH}"
+echo "Compiler    : ${CROSS_COMPILE}"
+echo "DTB List    : ${DTBS}"
+echo "Kernel Cfg  : ${KERNEL_CONFIG}"
 
 # Hikey960
 # Generate config file and enable specific configurations
@@ -371,5 +392,9 @@ export DTBS="hisilicon/hi3660-hikey960.dtb qcom/apq8016-sbc.dtb arm/juno-r2.dtb 
 config_kernel
 build_kernel_static_check
 build_kernel
+
+# No need to generate and copy images for Arm build
+[[ "$ARCH" == "arm" ]] && exit
+
 build_abootimg
 copy_images
