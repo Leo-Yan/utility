@@ -31,8 +31,11 @@ function build_kernel_static_check {
 
 	pushd $KERNEL
 	# Static check
-	make -j `nproc` C=1 CHECK="/data_nvme1n1/niayan01/tools/smatch/smatch -p=kernel" $TARGET O=$OUT
-	#make -j `nproc` C=1 $TARGET O=$OUT
+	if [[ "$STATIC_CHECK" == "smatch" ]]; then
+		make -j `nproc` C=1 CHECK="/data_nvme1n1/niayan01/tools/smatch/smatch -p=kernel" $TARGET O=$OUT
+	elif [[ "$STATIC_CHECK" == "sparse" ]]; then
+		make -j `nproc` C=1 $TARGET O=$OUT
+	fi
 	popd
 
 	# Directly bail out
@@ -103,7 +106,7 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
 	./scripts/config --file $OUT/.config -e CONFIG_TRACEPOINTS
 	./scripts/config --file $OUT/.config -e CONFIG_KPROBES
-	./scripts/config --file $OUT/.config -e CONFIG_UPROBES
+	./scripts/config --file $OUT/.config -d CONFIG_UPROBES
 	./scripts/config --file $OUT/.config -e CONFIG_KRETPROBES
 	./scripts/config --file $OUT/.config -e CONFIG_PROC_KCORE
 	./scripts/config --file $OUT/.config -e CONFIG_NOP_TRACER
@@ -116,6 +119,7 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_FTRACE
 	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_TRACER
 	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_GRAPH_TRACER
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_PROFILER
 	./scripts/config --file $OUT/.config -e CONFIG_SCHED_TRACER
 	./scripts/config --file $OUT/.config -e CONFIG_FTRACE_SYSCALLS
 	./scripts/config --file $OUT/.config -e CONFIG_TRACER_SNAPSHOT
@@ -138,6 +142,9 @@ function config_common_kernel {
 
 	./scripts/config --file $OUT/.config -e CONFIG_PTDUMP_DEBUGFS
 
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_DEBUG
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_FS
+
 	# Enable Arm CoreSight
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINKS_AND_SINKS
@@ -156,6 +163,10 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TNOC
 	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_DUMMY
 
+	#./scripts/config --file $OUT/.config -e CONFIG_KUNIT
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_KUNIT_TESTS
+	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TRBE_KUNIT_TESTS
+
 	./scripts/config --file $OUT/.config -e CONFIG_IPV6
 	./scripts/config --file $OUT/.config -e CONFIG_TEE
 	./scripts/config --file $OUT/.config -e CONFIG_FUSE_FS
@@ -168,6 +179,18 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_LTO_CLANG_THIN
 	./scripts/config --file $OUT/.config -e CONFIG_LTO_CLANG
 	./scripts/config --file $OUT/.config -e CONFIG_LTO
+
+	# ./scripts/config --file $OUT/.config -e --set-val CONFIG_ARCH_FORCE_MAX_ORDER 10
+
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_LOCK_ALLOC
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_ATOMIC_SLEEP
+
+	./scripts/config --file $OUT/.config -e CONFIG_STM
+	./scripts/config --file $OUT/.config -e CONFIG_STM_PROTO_BASIC
+	./scripts/config --file $OUT/.config -e CONFIG_STM_PROTO_SYS_T
+	./scripts/config --file $OUT/.config -e CONFIG_STM_DUMMY
+	./scripts/config --file $OUT/.config -e CONFIG_STM_SOURCE_CONSOLE
+	./scripts/config --file $OUT/.config -e CONFIG_STM_SOURCE_FTRACE
 }
 
 function config_hikey960 {
@@ -217,6 +240,12 @@ function config_network {
 	./scripts/config --file $OUT/.config -e CONFIG_USB_USBNET
 	./scripts/config --file $OUT/.config -e CONFIG_USB_NET_AX8817X
 	./scripts/config --file $OUT/.config -e CONFIG_USB_NET_AX88179_178A
+
+	# Enable network on Orion6
+	./scripts/config --file $OUT/.config -e CONFIG_8139CP
+	./scripts/config --file $OUT/.config -e CONFIG_8139TOO
+	./scripts/config --file $OUT/.config -e CONFIG_R8169
+	./scripts/config --file $OUT/.config -e CONFIG_RTASE
 }
 
 function config_block_device {
@@ -286,6 +315,7 @@ function build_kernel {
 		make LLVM=${LLVM} headers_install O=$OUT
 	else
 		make -j `nproc` $TARGET V=${VERBOSE} O=$OUT
+		make -j `nproc` Image.gz V=${VERBOSE} O=$OUT
 		make headers_install O=$OUT
 	fi
 
@@ -315,10 +345,12 @@ function build_kernel {
 	done
 
 	if [ ! -z ${BUILD_KMOD+x} ]; then
-		make -j `nproc` modules O=$OUT
-		make -j `nproc` O=$OUT INSTALL_MOD_PATH=$OUT/overlay modules_install
-		tar --owner root:0 --group root:0 -C $OUT/overlay -cf $OUT/overlay.tgz .
-		export COPY_IMAGE_LIST+=" $OUT/overlay.tgz"
+		make -j `nproc` $TARGET V=${VERBOSE} O=$OUT modules
+		sudo make -j `nproc` O=$OUT INSTALL_MOD_PATH=/data_nvme1n1/niayan01/work/nfs-debian-fs modules_install
+		#sudo make -j `nproc` O=$OUT INSTALL_MOD_PATH=/data_nvme1n1/niayan01/lab_juno_rootfs/ modules_install
+		#make -j `nproc` O=$OUT INSTALL_MOD_PATH=$OUT/overlay modules_install
+		#tar --owner root:0 --group root:0 -C $OUT/overlay -cf $OUT/overlay.tgz .
+		#export COPY_IMAGE_LIST+=" $OUT/overlay.tgz"
 	fi
 
 	popd
@@ -364,7 +396,7 @@ echo "Output folder is: $OUT"
 # Global variables for all platforms
 if [[ "$ARCH" == "arm64" ]]; then
 	export CROSS_COMPILE=aarch64-linux-gnu-
-	export DTBS="hisilicon/hi3660-hikey960.dtb qcom/apq8016-sbc.dtb arm/juno-r2.dtb arm/juno-r2-scmi.dtb arm/fvp-base-revc.dtb"
+	export DTBS="hisilicon/hi3660-hikey960.dtb qcom/apq8016-sbc.dtb arm/juno-r2.dtb arm/juno-r2-scmi.dtb arm/fvp-base-revc.dtb arm/morello-sdp.dtb"
 	export KERNEL_CONFIG=defconfig
 elif [[ "$ARCH" == "arm" ]]; then
 	export CROSS_COMPILE=arm-linux-gnueabi-
