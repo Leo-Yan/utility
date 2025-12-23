@@ -1,154 +1,32 @@
-" An example for a vimrc file.
-"
-" Maintainer:	Bram Moolenaar <Bram@vim.org>
-" Last change:	2002 Sep 19
-"
-" To use it, copy it to
-"     for Unix and OS/2:  ~/.vimrc
-"	      for Amiga:  s:.vimrc
-"  for MS-DOS and Win32:  $VIM\_vimrc
-"	    for OpenVMS:  sys$login:.vimrc
-
-" When started as "evim", evim.vim will already have done these settings.
-if v:progname =~? "evim"
-  finish
-endif
+" My (Leo Yan) vimrc file.
 
 " Use Vim settings, rather then Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
+set backspace=indent,eol,start  " allow backspacing over everything in insert mode
+set nobackup			" do not keep a backup file, use versions instead
+set history=50			" keep 50 lines of command line history
+set ruler			" show the cursor position all the time
+set showcmd			" display incomplete commands
+set incsearch			" do incremental searching
+set nu				" show number
 
-if has("vms")
-  set nobackup		" do not keep a backup file, use versions instead
-else
-  set nobackup		" keep a backup file
-endif
-set history=50		" keep 50 lines of command line history
-set ruler		    " show the cursor position all the time
-set showcmd		    " display incomplete commands
-set incsearch		" do incremental searching
-set nu
-set autoindent
+set autoindent			" auto indentation
+set noexpandtab			" do not expand tab as spaces
+set tabstop=8			" set tab as 8-chars width
+set cindent shiftwidth=8	" enable C-language indentation
 
-"set expandtab
-"set softtabstop=4
-"set tabstop=4
-"set cindent shiftwidth=4
-
-set noexpandtab
-set tabstop=8
-set cindent shiftwidth=8
-
-set makeprg=php\ -l\ %
-set errorformat=%m\ in\ %f\ on\ line\ %l
-
-autocmd BufWinEnter *.c,*.h,*.S let w:m1=matchadd('Search', '\%<81v.\%>77v', -1)
-autocmd BufWinEnter *.c,*.h,*.S let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
-
-highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-match ExtraWhitespace /\s\+$/
-autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
-autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-autocmd BufWinLeave * call clearmatches()
-
-autocmd ColorScheme * highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
-
-" colorscheme torte
-" colorscheme desert
-" colorscheme ron
-
-let g:miniBufExplMapWindowNavVim = 1
-let g:miniBufExplMapWindowNavArrows = 1
-let g:miniBufExplMapCTabSwitchBufs = 1
-let g:miniBufExplModSelTarget = 1
-"let g:miniBufExplMaxSize = 2
-
-nmap <silent> <F4>
-    \ :!ctags -f ./tags
-    \ --langmap="php:+.inc" --langmap="c:+.h"
-    \ -h ".php.inc.h" -R --totals=yes
-    \ --tag-relative=yes --PHP-kinds=+jicfv .<CR>
-set tags=./tags,tags
-
-let Tlist_Ctags_Cmd = "/usr/bin/ctags --language-force=C"
-let Tlist_Inc_Winwidth = 1
-let Tlist_Exit_OnlyWindow = 1
-let Tlist_File_Fold_Auto_Close = 1
-let Tlist_Process_File_Always = 1
-let Tlist_Enable_Fold_Column = 0
-let Tlist_Show_One_File = 1
-"let tlist_php_settings = 'php;c:class;d:constant;f:function'
-nnoremap <silent> <F8> :TlistToggle<CR>
-
-nnoremap <silent> P :Project<CR>
-nnoremap <silent> <C-F5> :!php %<CR>
-
-inoremap <C-P> <ESC>:call PhpDocSingle()<CR>i
-nnoremap <C-P> :call PhpDocSingle()<CR>
-vnoremap <C-P> :call PhpDocRange()<CR>
-
-imap <C-f> <C-x><C-o>
+" Set character encoding and file encodings
 if has("multi_byte")
     set encoding=utf-8
-    set termencoding=utf-8
     set formatoptions+=mM
     set fencs=utf-8,gbk
 
     if v:lang =~? '^\(zh\)\|\(ja\)\|\(ko\)'
         set ambiwidth=double
     endif
-
-    if has("win32")
-        source $VIMRUNTIME/delmenu.vim
-        source $VIMRUNTIME/menu.vim
-        language messages zh_CN.utf-8
-    endif
-else
-    echoerr "Sorry, this version of (g)vim was not compiled with +multi_byte"
 endif
-
-if has("gui_running")
-    set guioptions=
-    " colorscheme torte
-    "colorscheme desert
-    " colorscheme ron
-    " colorscheme default
-    set cursorline
-    if has("win32")
-        set guifont=Courier_New:h11:cANSI
-        "set gfn=Raize
-        au GUIEnter * simalt ~x
-    else
-        "set guifont=Courier\ 10\ Pitch\ 11
-        "set guifontwide=WenQuanYi\ Bitmap\ Song\ 11
-        set guifont=Courier\ 10\ Pitch\ 10
-        "set guifont=WenQuanYi\ Micro\ Hei\ Mono\ 10
-        set guifontwide=WenQuanYi\ Micro\ Hei\ Mono\ 10
-    endif
-else
-    set t_Co=256
-    "colorscheme default
-    "colorscheme desert
-    "colorscheme torte
-    "colorscheme calmar256-dark
-    "colorscheme zenburn
-    colorscheme desertEx
-    "colorscheme gentooish
-endif
-
-" For Win32 GUI: remove 't' flag from 'guioptions': no tearoff menu entries
-" let &guioptions = substitute(&guioptions, "t", "", "g")
-
-" Don't use Ex mode, use Q for formatting
-map Q gq
-
-" This is an alternative that also works in block mode, but the deleted
-" text is lost and it only works for putting the current register.
-"vnoremap p "_dp
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -157,38 +35,223 @@ if &t_Co > 2 || has("gui_running")
   set hlsearch
 endif
 
-" Only do this part when compiled with support for autocommands.
-if has("autocmd")
+" Filetype specific rules
+augroup file_spec_format
+    autocmd!
 
-  " Enable file type detection.
-  " Use the default filetype settings, so that mail gets 'tw' set to 72,
-  " 'cindent' is on in C files, etc.
-  " Also load indent files, to automatically do language-dependent indenting.
-  filetype plugin indent on
+    filetype plugin indent on	" enable file type detection
 
-  " Put these in an autocmd group, so that we can delete them easily.
-  augroup vimrcEx
-  au!
+    " For all text and markdown files set 'textwidth' to 78 characters.
+    autocmd FileType text setlocal textwidth=78
+    autocmd FileType md setlocal textwidth=78
 
-  " For all text files set 'textwidth' to 78 characters.
-  autocmd FileType text setlocal textwidth=78
+    " enables spell checking for Git commit messages.
+    autocmd Filetype gitcommit setlocal spell spelllang=en_us
 
-  " When editing a file, always jump to the last known cursor position.
-  " Don't do it when the position is invalid or when inside an event handler
-  " (happens when dropping a file on gvim).
-  autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   exe "normal g`\"" |
-    \ endif
+    " Disables wrapping for Org files.
+    autocmd bufreadpre *.org setlocal textwidth=0
 
-  augroup END
+    " Restore last cursor position on file open.
+    " Don't do it when the position is invalid or when inside an event handler
+    " (happens when dropping a file on gvim).
+    autocmd BufReadPost *
+      \ if line("'\"") > 0 && line("'\"") <= line("$") |
+      \   exe "normal g`\"" |
+      \ endif
+augroup END
 
-else
+" Highlight for columns 78–80 (warning) and columns > 80 (error)
+augroup c_width_check
+    autocmd!
+    autocmd BufWinEnter *.c,*.h,*.S,*.s let w:m1=matchadd('Search', '\%<81v.\%>77v', -1)
+    autocmd BufWinEnter *.c,*.h,*.S,*.s let w:m2=matchadd('ErrorMsg', '\%>80v.\+', -1)
+augroup END
 
-  set autoindent		" always set autoindenting on
+" Highlight trailing whitespace
+highlight ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
 
-endif " has("autocmd")
+augroup extra_whitespace
+    autocmd!
+    " Re-apply highlight after :colorscheme
+    autocmd ColorScheme * highlight default ExtraWhitespace ctermbg=darkgreen guibg=darkgreen
 
-set noai
+    " Apply/refresh per-window matches
+    autocmd BufWinEnter * call s:ExtraWhitespaceMatch(0)
+    autocmd InsertEnter * call s:ExtraWhitespaceMatch(1)
+    autocmd InsertLeave * call s:ExtraWhitespaceMatch(0)
 
-autocmd Filetype gitcommit setlocal spell spelllang=en_us
+    " Clean up window-local match on leave
+    autocmd BufWinLeave * call s:ExtraWhitespaceClear()
+augroup END
+
+function! s:ExtraWhitespaceMatch(in_insert) abort
+    " Keep the match window-local so we can update/clear safely.
+    if exists('w:extra_ws_match_id')
+        call matchdelete(w:extra_ws_match_id)
+        unlet w:extra_ws_match_id
+    endif
+
+    if a:in_insert
+        let l:pat = '\s\+\%#\@<!$'
+    else
+        let l:pat = '\s\+$'
+    endif
+
+    let w:extra_ws_match_id = matchadd('ExtraWhitespace', l:pat)
+endfunction
+
+function! s:ExtraWhitespaceClear() abort
+    if exists('w:extra_ws_match_id')
+        call matchdelete(w:extra_ws_match_id)
+        unlet w:extra_ws_match_id
+    endif
+endfunction
+
+if exists(':MiniBufExplorer') || exists('g:loaded_minibufexpl') || globpath(&rtp, 'plugin/minibufexpl.vim') != ''
+    " Enable window navigation mappings inside miniBufExplorer
+    let g:miniBufExplMapWindowNavVim    = 1   " Use <C-h/j/k/l> to move between windows
+    let g:miniBufExplMapWindowNavArrows = 1   " Use arrow keys to move between windows
+    let g:miniBufExplMapCTabSwitchBufs  = 1   " <C-Tab>/<C-S-Tab> cycle buffers (if supported)
+    let g:miniBufExplModSelTarget       = 1   " Prefer target window for modified buffer selection
+    let g:miniBufExplMaxSize            = 2   " Limit explorer height
+endif
+
+if exists(':TlistToggle')
+    " Force ctags to parse as C (useful if your code is mostly C / kernel)
+    let Tlist_Ctags_Cmd                 = 'ctags --language-force=C'
+    let Tlist_Inc_Winwidth              = 0   " Do not auto-resize Taglist window
+    let Tlist_Exit_OnlyWindow           = 1   " If Taglist is the only window, quit Vim
+    let Tlist_File_Fold_Auto_Close      = 1   " Auto-close folds for non-current files
+    let Tlist_Process_File_Always       = 1   " Always (re)generate tags when entering buffer
+    let Tlist_Enable_Fold_Column        = 0   " Hide fold column in Taglist window
+    let Tlist_Show_One_File             = 1   " Show tags only for current file
+endif
+
+" Only define defaults if the user has not overridden them
+if !exists('g:utl_cfg_hdl_scm_http')
+    " Use xdg-open if available (common on Linux systems)
+    let g:utl_cfg_hdl_scm_http_system   = 'silent! !xdg-open %u'
+    let g:utl_cfg_hdl_scm_http          = g:utl_cfg_hdl_scm_http_system
+endif
+
+if exists('g:loaded_vimtex')
+    let g:tex_flavor = 'latex'
+
+    " PDF viewer (Linux example: zathura)
+    if executable('zathura')
+        let g:latex_view_general_viewer = 'zathura'
+        let g:vimtex_view_method        = 'zathura'
+    endif
+    " macOS alternative:
+    " let g:vimtex_view_method = 'skim'
+
+    " Quickfix behavior
+    let g:vimtex_quickfix_open_on_warning = 0
+    let g:vimtex_quickfix_mode            = 2
+
+    " Optional latexmk config (kept commented; enable if you need it)
+    " let g:vimtex_compiler_latexmk = {
+    "       \ 'build_dir' : '',
+    "       \ 'callback' : 1,
+    "       \ 'continuous' : 1,
+    "       \ 'executable' : 'latexmk',
+    "       \ 'hooks' : [],
+    "       \ 'options' : [
+    "       \   '-verbose',
+    "       \   '-file-line-error',
+    "       \   '-synctex=1',
+    "       \   '-interaction=nonstopmode',
+    "       \   '-pdf',
+    "       \ ],
+    "       \}
+    "
+    " let g:vimtex_compiler_latexmk_engines = {
+    "       \ '_'                : '-pdf',
+    "       \ 'pdflatex'         : '-pdf',
+    "       \ 'dvipdfex'         : '-pdfdvi',
+    "       \ 'lualatex'         : '-lualatex',
+    "       \ 'xelatex'          : '-xelatex',
+    "       \ 'context (pdftex)' : '-pdf -pdflatex=texexec',
+    "       \ 'context (luatex)' : '-pdf -pdflatex=context',
+    "       \ 'context (xetex)'  : '-pdf -pdflatex=''texexec --xtx''',
+    "       \}
+endif
+
+augroup mutt_mail
+    autocmd!
+    " Apply mail-friendly settings to mutt temp files
+    autocmd BufNewFile,BufRead /tmp/mutt*,$HOME/tmp/mutt* call s:mutt_settings()
+augroup END
+
+function! s:mutt_settings() abort
+    setlocal noautoindent
+    setlocal filetype=mail
+    setlocal wrapmargin=0
+    setlocal textwidth=78
+    setlocal nonumber
+    setlocal digraph
+    setlocal nolist
+endfunction
+
+" netrw (built-in file browser) settings
+let g:netrw_banner = 0
+let g:netrw_browse_split = 4
+let g:netrw_winsize = 25
+let g:netrw_altv = 1
+let g:netrw_alto = 1
+
+"set termguicolors
+let g:solarized_termcolors=256
+"let g:solarized_style="light"
+let g:solarized_diffmode="normal"
+let g:solarized_contrast="normal"
+let g:solarized_visibility="flat"
+let g:solarized_use16=1
+"let g:solarized_italics=1
+set background=dark
+colorscheme solarized8
+
+" Insert Reviewed-by / Tested-by tags
+function! s:InsertTag(line) abort
+   " Append a new line below the cursor without clobbering registers/history
+   call append(line('.'), a:line)
+endfunction
+
+function! s:ReviewTag() abort
+   call s:InsertTag('Reviewed-by: Leo Yan <leo.yan@arm.com>')
+endfunction
+
+function! s:TestTag() abort
+   call s:InsertTag('Tested-by: Leo Yan <leo.yan@arm.com>')
+endfunction
+
+" Normal mode mappings
+nnoremap <silent> <F11> :call <SID>ReviewTag()<CR>
+nnoremap <silent> <F12> :call <SID>TestTag()<CR>
+
+" Insert mode mappings (return to insert where you were)
+inoremap <silent> <F11> <C-o>:call <SID>ReviewTag()<CR>
+inoremap <silent> <F12> <C-o>:call <SID>TestTag()<CR>
+
+" Toggle Taglist (normal mode)
+nnoremap <silent> <F8> :TlistToggle<CR>
+
+" Replace Ex mode with text formatting (use Q as gq)
+nnoremap Q gq
+vnoremap Q gq
+
+" In insert mode, make <C-d> delete forward (like <Del>)
+inoremap <C-d> <Del>
+
+" Open netrw file explorer (normal mode)
+nnoremap <silent> <C-E> :Lexplore<CR>
+
+call plug#begin()
+Plug 'yegappan/taglist'
+Plug 'dr-kino/cscope-maps'
+Plug 'jceb/vim-orgmode'
+Plug 'tpope/vim-speeddating'
+Plug 'inkarkat/vim-SyntaxRange'
+Plug 'vimwiki/vimwiki'
+Plug 'lervag/vimtex'
+call plug#end()
