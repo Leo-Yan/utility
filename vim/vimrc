@@ -84,27 +84,30 @@ augroup extra_whitespace
     autocmd BufWinLeave * call s:ExtraWhitespaceClear()
 augroup END
 
-function! s:ExtraWhitespaceMatch(in_insert) abort
-    " Keep the match window-local so we can update/clear safely.
-    if exists('w:extra_ws_match_id')
-        call matchdelete(w:extra_ws_match_id)
-        unlet w:extra_ws_match_id
-    endif
-
-    if a:in_insert
-        let l:pat = '\s\+\%#\@<!$'
-    else
-        let l:pat = '\s\+$'
-    endif
-
-    let w:extra_ws_match_id = matchadd('ExtraWhitespace', l:pat)
+function! s:ExtraWhitespaceSkip() abort
+    " Skip special buffers (netrw, help, terminals, etc.)
+    if &buftype !=# '' | return 1 | endif
+    if &filetype ==# 'netrw' | return 1 | endif
+    return 0
 endfunction
 
 function! s:ExtraWhitespaceClear() abort
     if exists('w:extra_ws_match_id')
-        call matchdelete(w:extra_ws_match_id)
+	" ID may already be gone if another plugin/netrw cleared matches
+        silent! call matchdelete(w:extra_ws_match_id)
         unlet w:extra_ws_match_id
     endif
+endfunction
+
+function! s:ExtraWhitespaceMatch(in_insert) abort
+    if s:ExtraWhitespaceSkip()
+        return
+    endif
+
+    call s:ExtraWhitespaceClear()
+
+    let l:pat = a:in_insert ? '\s\+\%#\@<!$' : '\s\+$'
+    let w:extra_ws_match_id = matchadd('ExtraWhitespace', l:pat)
 endfunction
 
 if exists(':MiniBufExplorer') || exists('g:loaded_minibufexpl') || globpath(&rtp, 'plugin/minibufexpl.vim') != ''
@@ -116,16 +119,23 @@ if exists(':MiniBufExplorer') || exists('g:loaded_minibufexpl') || globpath(&rtp
     let g:miniBufExplMaxSize            = 2   " Limit explorer height
 endif
 
-if exists(':TlistToggle')
-    " Force ctags to parse as C (useful if your code is mostly C / kernel)
-    let Tlist_Ctags_Cmd                 = 'ctags --language-force=C'
-    let Tlist_Inc_Winwidth              = 0   " Do not auto-resize Taglist window
-    let Tlist_Exit_OnlyWindow           = 1   " If Taglist is the only window, quit Vim
-    let Tlist_File_Fold_Auto_Close      = 1   " Auto-close folds for non-current files
-    let Tlist_Process_File_Always       = 1   " Always (re)generate tags when entering buffer
-    let Tlist_Enable_Fold_Column        = 0   " Hide fold column in Taglist window
-    let Tlist_Show_One_File             = 1   " Show tags only for current file
-endif
+" Keep Taglist in sync when buffers are closed/switched
+augroup taglist_autoclean
+    autocmd!
+    " Refresh when switching buffers (covers most cases)
+    autocmd BufEnter * if exists(':TlistUpdate') | silent! TlistUpdate | endif
+    " Refresh again when a buffer is deleted/wiped out (your case)
+    autocmd BufDelete,BufWipeout * if exists(':TlistUpdate') | silent! TlistUpdate | endif
+augroup END
+
+" Force ctags to parse as C (useful if your code is mostly C / kernel)
+let Tlist_Ctags_Cmd                 = 'ctags --language-force=C'
+let Tlist_Inc_Winwidth              = 0   " Do not auto-resize Taglist window
+let Tlist_Exit_OnlyWindow           = 1   " If Taglist is the only window, quit Vim
+let Tlist_File_Fold_Auto_Close      = 1   " Auto-close folds for non-current files
+let Tlist_Process_File_Always       = 1   " Always (re)generate tags when entering buffer
+let Tlist_Enable_Fold_Column        = 0   " Hide fold column in Taglist window
+let Tlist_Show_One_File             = 1   " Show tags only for current file
 
 " Only define defaults if the user has not overridden them
 if !exists('g:utl_cfg_hdl_scm_http')
@@ -196,7 +206,7 @@ endfunction
 " netrw (built-in file browser) settings
 let g:netrw_banner = 0
 let g:netrw_browse_split = 4
-let g:netrw_winsize = 25
+let g:netrw_winsize = 50
 let g:netrw_altv = 1
 let g:netrw_alto = 1
 
