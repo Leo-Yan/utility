@@ -114,9 +114,9 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_RING_BUFFER
 	./scripts/config --file $OUT/.config -e CONFIG_EVENT_TRACING
 	./scripts/config --file $OUT/.config -e CONFIG_CONTEXT_SWITCH_TRACER
-	./scripts/config --file $OUT/.config -e CONFIG_TRACING
 	./scripts/config --file $OUT/.config -e CONFIG_GENERIC_TRACER
 	./scripts/config --file $OUT/.config -e CONFIG_FTRACE
+	./scripts/config --file $OUT/.config -e CONFIG_TRACING
 	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_TRACER
 	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_GRAPH_TRACER
 	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_PROFILER
@@ -191,6 +191,30 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_STM_DUMMY
 	./scripts/config --file $OUT/.config -e CONFIG_STM_SOURCE_CONSOLE
 	./scripts/config --file $OUT/.config -e CONFIG_STM_SOURCE_FTRACE
+}
+
+function config_bpf_selftest {
+	./scripts/config --file $OUT/.config -e CONFIG_MODULE_ALLOW_BTF_MISMATCH
+	./scripts/config --file $OUT/.config -e CONFIG_IPV6
+	./scripts/config --file $OUT/.config -e CONFIG_NET_SCH_BPF
+	./scripts/config --file $OUT/.config -e CONFIG_SMC
+	./scripts/config --file $OUT/.config -e CONFIG_INFINIBAND
+	./scripts/config --file $OUT/.config -e CONFIG_SMC
+	./scripts/config --file $OUT/.config -e CONFIG_DIBS
+	./scripts/config --file $OUT/.config -e CONFIG_SMC
+	./scripts/config --file $OUT/.config -e CONFIG_MPTCP
+	./scripts/config --file $OUT/.config -e CONFIG_NF_CONNTRACK_MARK
+	./scripts/config --file $OUT/.config -e CONFIG_NF_CONNTRACK_SECMARK
+	./scripts/config --file $OUT/.config -e CONFIG_NF_NAT
+	./scripts/config --file $OUT/.config -e CONFIG_NF_CONNTRACK_ZONES
+	./scripts/config --file $OUT/.config -e CONFIG_NF_CONNTRACK
+	./scripts/config --file $OUT/.config -e CONFIG_VXLAN
+	./scripts/config --file $OUT/.config -e CONFIG_XFRM_ALGO
+	./scripts/config --file $OUT/.config -e CONFIG_IPV6_MIP6
+	./scripts/config --file $OUT/.config -e CONFIG_IPV6_GRE
+	./scripts/config --file $OUT/.config -e CONFIG_NET_IPGRE_DEMUX
+	./scripts/config --file $OUT/.config -e CONFIG_IPV6_GRE
+	./scripts/config --file $OUT/.config -e CONFIG_NET_ACT_TUNNEL_KEY
 }
 
 function config_hikey960 {
@@ -294,6 +318,7 @@ function config_kernel {
 	fi
 
 	config_common_kernel
+	config_bpf_selftest
 	config_network
 	config_block_device
 	config_virt_device
