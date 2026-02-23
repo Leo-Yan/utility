@@ -101,12 +101,22 @@ function config_arm64_kernel {
 }
 
 function config_common_kernel {
+	./scripts/config --file $OUT/.config -e CONFIG_WERROR
+	./scripts/config --file $OUT/.config -e CONFIG_TASK_DELAY_ACCT
+	./scripts/config --file $OUT/.config -e CONFIG_EXPERT
+	./scripts/config --file $OUT/.config -e CONFIG_LOCKUP_DETECTOR
+	./scripts/config --file $OUT/.config -e CONFIG_SOFTLOCKUP_DETECTOR
+	./scripts/config --file $OUT/.config -e CONFIG_DETECT_HUNG_TASK
+	./scripts/config --file $OUT/.config -e CONFIG_SCHEDSTATS
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_PREEMPT
+	./scripts/config --file $OUT/.config -e CONFIG_LOCK_STAT
+
 	# Enable debugging features
 	./scripts/config --file $OUT/.config -e CONFIG_BPF_SYSCALL
 	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
 	./scripts/config --file $OUT/.config -e CONFIG_TRACEPOINTS
 	./scripts/config --file $OUT/.config -e CONFIG_KPROBES
-	./scripts/config --file $OUT/.config -d CONFIG_UPROBES
+	./scripts/config --file $OUT/.config -e CONFIG_UPROBES
 	./scripts/config --file $OUT/.config -e CONFIG_KRETPROBES
 	./scripts/config --file $OUT/.config -e CONFIG_PROC_KCORE
 	./scripts/config --file $OUT/.config -e CONFIG_NOP_TRACER
@@ -119,7 +129,7 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_TRACING
 	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_TRACER
 	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_GRAPH_TRACER
-	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_PROFILER
+	#./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_PROFILER
 	./scripts/config --file $OUT/.config -e CONFIG_SCHED_TRACER
 	./scripts/config --file $OUT/.config -e CONFIG_FTRACE_SYSCALLS
 	./scripts/config --file $OUT/.config -e CONFIG_TRACER_SNAPSHOT
@@ -129,8 +139,8 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_EVENTS
 	./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
 	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
-	./scripts/config --file $OUT/.config -e CONFIG_FPROBE
-	./scripts/config --file $OUT/.config -e CONFIG_BPF_LSM
+	#./scripts/config --file $OUT/.config -e CONFIG_FPROBE
+	#./scripts/config --file $OUT/.config -e CONFIG_BPF_LSM
 
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
@@ -142,26 +152,26 @@ function config_common_kernel {
 
 	./scripts/config --file $OUT/.config -e CONFIG_PTDUMP_DEBUGFS
 
-	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_DEBUG
-	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_FS
+	#./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_DEBUG
+	#./scripts/config --file $OUT/.config -e CONFIG_DEBUG_FS
 
 	# Enable Arm CoreSight
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINKS_AND_SINKS
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINK_AND_SINK_TMC
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CATU
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_TPIU
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_ETBV10
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM3X
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM4X
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_STM
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTCU
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CPU_DEBUG
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TRBE
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TNOC
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_DUMMY
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_LINKS_AND_SINKS
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_LINK_AND_SINK_TMC
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CATU
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SINK_TPIU
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SINK_ETBV10
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SOURCE_ETM3X
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SOURCE_ETM4X
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_STM
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CTCU
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CPU_DEBUG
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CTI
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_TRBE
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_TNOC
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_DUMMY
 
 	#./scripts/config --file $OUT/.config -e CONFIG_KUNIT
 	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_KUNIT_TESTS
@@ -176,11 +186,16 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_SECURITY_PATH
 	./scripts/config --file $OUT/.config -e CONFIG_SECURITY_APPARMOR
 
-	./scripts/config --file $OUT/.config -e CONFIG_LTO_CLANG_THIN
-	./scripts/config --file $OUT/.config -e CONFIG_LTO_CLANG
-	./scripts/config --file $OUT/.config -e CONFIG_LTO
+	./scripts/config --file $OUT/.config -d CONFIG_LTO_CLANG_THIN
+	./scripts/config --file $OUT/.config -d CONFIG_LTO_CLANG
+	./scripts/config --file $OUT/.config -d CONFIG_LTO
 
 	# ./scripts/config --file $OUT/.config -e --set-val CONFIG_ARCH_FORCE_MAX_ORDER 10
+
+	./scripts/config --file $OUT/.config -e CONFIG_PROVE_LOCKING
+	./scripts/config --file $OUT/.config -e CONFIG_PROVE_RAW_LOCK_NESTING
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_WW_MUTEX_SLOWPATH
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_RWSEMS
 
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_LOCK_ALLOC
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_ATOMIC_SLEEP
@@ -191,6 +206,9 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_STM_DUMMY
 	./scripts/config --file $OUT/.config -e CONFIG_STM_SOURCE_CONSOLE
 	./scripts/config --file $OUT/.config -e CONFIG_STM_SOURCE_FTRACE
+
+	# ./scripts/config --file $OUT/.config -e CONFIG_DEBUG_KMEMLEAK
+	# ./scripts/config --file $OUT/.config -e CONFIG_DEBUG_DEVRES
 }
 
 function config_bpf_selftest {
@@ -303,6 +321,8 @@ function config_virt_device {
 }
 
 function config_kernel {
+	#cp config_james $KERNEL/.config
+
 	pushd $KERNEL
 
 	if [ -n "$LLVM" ]; then
@@ -371,11 +391,12 @@ function build_kernel {
 
 	if [ ! -z ${BUILD_KMOD+x} ]; then
 		make -j `nproc` $TARGET V=${VERBOSE} O=$OUT modules
-		sudo make -j `nproc` O=$OUT INSTALL_MOD_PATH=/data_nvme1n1/niayan01/work/nfs-debian-fs modules_install
+		#sudo make -j `nproc` O=$OUT INSTALL_MOD_PATH=/data_nvme1n1/niayan01/work/nfs-debian-fs modules_install
 		#sudo make -j `nproc` O=$OUT INSTALL_MOD_PATH=/data_nvme1n1/niayan01/lab_juno_rootfs/ modules_install
-		#make -j `nproc` O=$OUT INSTALL_MOD_PATH=$OUT/overlay modules_install
-		#tar --owner root:0 --group root:0 -C $OUT/overlay -cf $OUT/overlay.tgz .
-		#export COPY_IMAGE_LIST+=" $OUT/overlay.tgz"
+		rm -rf $OUT/overlay
+		make -j `nproc` O=$OUT INSTALL_MOD_PATH=$OUT/overlay modules_install
+		tar --owner root:0 --group root:0 -C $OUT/overlay -cf $OUT/overlay.tgz .
+		export COPY_IMAGE_LIST+=" $OUT/overlay.tgz"
 	fi
 
 	popd
@@ -403,7 +424,7 @@ function build_abootimg {
 }
 
 function copy_images {
-	cp $IMAGE_FILE /var/lib/tftpboot/
+	# cp $IMAGE_FILE /var/lib/tftpboot/
 
 	if [ -z "${COPY_TGT}" ]; then
 		return
@@ -420,10 +441,12 @@ echo "Output folder is: $OUT"
 
 # Global variables for all platforms
 if [[ "$ARCH" == "arm64" ]]; then
+	export ARCH=arm64
 	export CROSS_COMPILE=aarch64-linux-gnu-
 	export DTBS="hisilicon/hi3660-hikey960.dtb qcom/apq8016-sbc.dtb arm/juno-r2.dtb arm/juno-r2-scmi.dtb arm/fvp-base-revc.dtb arm/morello-sdp.dtb"
 	export KERNEL_CONFIG=defconfig
 elif [[ "$ARCH" == "arm" ]]; then
+	export ARCH=arm
 	export CROSS_COMPILE=arm-linux-gnueabi-
 	export DTBS=""
 	export KERNEL_CONFIG=u8500_defconfig
@@ -453,5 +476,5 @@ build_kernel
 # No need to generate and copy images for Arm build
 [[ "$ARCH" == "arm" ]] && exit
 
-build_abootimg
+#build_abootimg
 copy_images
