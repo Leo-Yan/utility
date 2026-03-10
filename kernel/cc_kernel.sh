@@ -101,17 +101,17 @@ function config_arm64_kernel {
 }
 
 function config_common_kernel {
+	# Enable debugging features
 	./scripts/config --file $OUT/.config -e CONFIG_WERROR
 	./scripts/config --file $OUT/.config -e CONFIG_TASK_DELAY_ACCT
 	./scripts/config --file $OUT/.config -e CONFIG_EXPERT
-	./scripts/config --file $OUT/.config -e CONFIG_LOCKUP_DETECTOR
 	./scripts/config --file $OUT/.config -e CONFIG_SOFTLOCKUP_DETECTOR
 	./scripts/config --file $OUT/.config -e CONFIG_DETECT_HUNG_TASK
 	./scripts/config --file $OUT/.config -e CONFIG_SCHEDSTATS
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_PREEMPT
 	./scripts/config --file $OUT/.config -e CONFIG_LOCK_STAT
 
-	# Enable debugging features
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT
 	./scripts/config --file $OUT/.config -e CONFIG_BPF_SYSCALL
 	./scripts/config --file $OUT/.config -e CONFIG_BPF_JIT_ALWAYS_ON
 	./scripts/config --file $OUT/.config -e CONFIG_TRACEPOINTS
@@ -129,7 +129,7 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_TRACING
 	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_TRACER
 	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_GRAPH_TRACER
-	#./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_PROFILER
+	./scripts/config --file $OUT/.config -e CONFIG_FUNCTION_PROFILER
 	./scripts/config --file $OUT/.config -e CONFIG_SCHED_TRACER
 	./scripts/config --file $OUT/.config -e CONFIG_FTRACE_SYSCALLS
 	./scripts/config --file $OUT/.config -e CONFIG_TRACER_SNAPSHOT
@@ -139,39 +139,36 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_EVENTS
 	./scripts/config --file $OUT/.config -e CONFIG_PROBE_EVENTS
 	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_FTRACE
-	#./scripts/config --file $OUT/.config -e CONFIG_FPROBE
-	#./scripts/config --file $OUT/.config -e CONFIG_BPF_LSM
+	./scripts/config --file $OUT/.config -e CONFIG_FPROBE
 
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_DWARF5
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_INFO_BTF
 	./scripts/config --file $OUT/.config -d CONFIG_DEBUG_INFO_REDUCED
 	./scripts/config --file $OUT/.config -e CONFIG_MODULE_ALLOW_BTF_MISMATCH
-
-	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_DEBUG
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_FS
 
 	./scripts/config --file $OUT/.config -e CONFIG_PTDUMP_DEBUGFS
 
-	#./scripts/config --file $OUT/.config -e CONFIG_DYNAMIC_DEBUG
-	#./scripts/config --file $OUT/.config -e CONFIG_DEBUG_FS
-
 	# Enable Arm CoreSight
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_LINKS_AND_SINKS
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_LINK_AND_SINK_TMC
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CATU
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SINK_TPIU
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SINK_ETBV10
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SOURCE_ETM3X
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SOURCE_ETM4X
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_STM
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CTCU
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CPU_DEBUG
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CTI
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_TRBE
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_TNOC
-	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_DUMMY
+	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINKS_AND_SINKS
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINK_AND_SINK_TMC
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CATU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_TPIU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_ETBV10
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM3X
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM4X
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_STM
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTCU
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CPU_DEBUG
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TRBE
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TNOC
+	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_DUMMY
 
 	#./scripts/config --file $OUT/.config -e CONFIG_KUNIT
 	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_KUNIT_TESTS
@@ -192,6 +189,7 @@ function config_common_kernel {
 
 	# ./scripts/config --file $OUT/.config -e --set-val CONFIG_ARCH_FORCE_MAX_ORDER 10
 
+	./scripts/config --file $OUT/.config -e CONFIG_LOCKUP_DETECTOR
 	./scripts/config --file $OUT/.config -e CONFIG_PROVE_LOCKING
 	./scripts/config --file $OUT/.config -e CONFIG_PROVE_RAW_LOCK_NESTING
 	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_WW_MUTEX_SLOWPATH
@@ -207,11 +205,22 @@ function config_common_kernel {
 	./scripts/config --file $OUT/.config -e CONFIG_STM_SOURCE_CONSOLE
 	./scripts/config --file $OUT/.config -e CONFIG_STM_SOURCE_FTRACE
 
-	# ./scripts/config --file $OUT/.config -e CONFIG_DEBUG_KMEMLEAK
-	# ./scripts/config --file $OUT/.config -e CONFIG_DEBUG_DEVRES
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_KMEMLEAK
+	./scripts/config --file $OUT/.config -e CONFIG_DEBUG_DEVRES
 }
 
 function config_bpf_selftest {
+	./scripts/config --file $OUT/.config -e CONFIG_BPF_LSM
+	./scripts/config --file $OUT/.config -e CONFIG_SCHED_CLASS_EXT
+	./scripts/config --file $OUT/.config -e CONFIG_NETFILTER
+	./scripts/config --file $OUT/.config -e CONFIG_NETFILTER_BPF_LINK
+	./scripts/config --file $OUT/.config -e CONFIG_NETFILTER_CONNCOUNT
+	./scripts/config --file $OUT/.config -e CONFIG_NFT_CONNLIMIT
+	./scripts/config --file $OUT/.config -e CONFIG_NF_TABLES
+	./scripts/config --file $OUT/.config -e CONFIG_NETFILTER_ADVANCED
+	./scripts/config --file $OUT/.config -e CONFIG_NETFILTER_XT_MATCH_CONNLIMIT
+	./scripts/config --file $OUT/.config -e CONFIG_MEMCG
+	./scripts/config --file $OUT/.config -e CONFIG_CGROUP_BPF
 	./scripts/config --file $OUT/.config -e CONFIG_MODULE_ALLOW_BTF_MISMATCH
 	./scripts/config --file $OUT/.config -e CONFIG_IPV6
 	./scripts/config --file $OUT/.config -e CONFIG_NET_SCH_BPF
@@ -288,6 +297,8 @@ function config_network {
 	./scripts/config --file $OUT/.config -e CONFIG_8139TOO
 	./scripts/config --file $OUT/.config -e CONFIG_R8169
 	./scripts/config --file $OUT/.config -e CONFIG_RTASE
+
+	./scripts/config --file $OUT/.config -e CONFIG_NFS_V4_0
 }
 
 function config_block_device {
@@ -305,6 +316,9 @@ function config_block_device {
 }
 
 function config_virt_device {
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_RING
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_PCI
 	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_FS
 	./scripts/config --file $OUT/.config -e CONFIG_SCSI_VIRTIO
 	./scripts/config --file $OUT/.config -e CONFIG_I2C_VIRTIO
@@ -312,6 +326,14 @@ function config_virt_device {
 	./scripts/config --file $OUT/.config -e CONFIG_SND_VIRTIO
 	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_INPUT
 	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_MEM
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_NET
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_BLK
+	./scripts/config --file $OUT/.config -e CONFIG_NET_9P
+	./scripts/config --file $OUT/.config -e CONFIG_NET_9P_VIRTIO
+	./scripts/config --file $OUT/.config -e CONFIG_9P_FS
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_BALLOON
+	./scripts/config --file $OUT/.config -e CONFIG_VIRTIO_CONSOLE
+	./scripts/config --file $OUT/.config -e CONFIG_HW_RANDOM_VIRTIO
 	./scripts/config --file $OUT/.config -e CONFIG_MACVLAN
 	./scripts/config --file $OUT/.config -e CONFIG_MACVTAP
 	./scripts/config --file $OUT/.config -e CONFIG_VHOST_IOTLB
@@ -324,6 +346,8 @@ function config_kernel {
 	#cp config_james $KERNEL/.config
 
 	pushd $KERNEL
+
+	make mrproper
 
 	if [ -n "$LLVM" ]; then
 		make LLVM=${LLVM} $KERNEL_CONFIG O=$OUT
@@ -360,7 +384,7 @@ function build_kernel {
 		make LLVM=${LLVM} headers_install O=$OUT
 	else
 		make -j `nproc` $TARGET V=${VERBOSE} O=$OUT
-		make -j `nproc` Image.gz V=${VERBOSE} O=$OUT
+		[ "$ARCH" = "arm64" ] && make -j `nproc` Image.gz V=${VERBOSE} O=$OUT
 		make headers_install O=$OUT
 	fi
 
@@ -445,14 +469,21 @@ if [[ "$ARCH" == "arm64" ]]; then
 	export CROSS_COMPILE=aarch64-linux-gnu-
 	export DTBS="hisilicon/hi3660-hikey960.dtb qcom/apq8016-sbc.dtb arm/juno-r2.dtb arm/juno-r2-scmi.dtb arm/fvp-base-revc.dtb arm/morello-sdp.dtb"
 	export KERNEL_CONFIG=defconfig
+	export TARGET=Image
 elif [[ "$ARCH" == "arm" ]]; then
 	export ARCH=arm
 	export CROSS_COMPILE=arm-linux-gnueabi-
 	export DTBS=""
 	export KERNEL_CONFIG=u8500_defconfig
+	export TARGET=Image
+elif [[ "$ARCH" == "x86_64" ]]; then
+	export ARCH=x86_64
+	unset CROSS_COMPILE
+	export DTBS=""
+	export KERNEL_CONFIG=x86_64_defconfig
+	export TARGET=bzImage
 fi
 
-export TARGET=Image
 
 echo "Architecture: ${ARCH}"
 echo "Compiler    : ${CROSS_COMPILE}"
