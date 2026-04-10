@@ -89,12 +89,12 @@ function config_arm64_kernel {
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_VISCONTI
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_XGENE
 	./scripts/config --file $OUT/.config -d CONFIG_ARCH_ZYNQMP
+	./scripts/config --file $OUT/.config -d CONFIG_ARCH_HISI
+	./scripts/config --file $OUT/.config -d CONFIG_ARCH_XGENE
+	./scripts/config --file $OUT/.config -d CONFIG_ARCH_QCOM
 
 	# Enable platform specific config
-	./scripts/config --file $OUT/.config -e CONFIG_ARCH_HISI
 	./scripts/config --file $OUT/.config -e CONFIG_ARCH_VEXPRESS
-	./scripts/config --file $OUT/.config -e CONFIG_ARCH_XGENE
-	./scripts/config --file $OUT/.config -e CONFIG_ARCH_QCOM
 
 	# Enable Arm SPE
 	./scripts/config --file $OUT/.config -e CONFIG_ARM_SPE_PMU
@@ -153,22 +153,23 @@ function config_common_kernel {
 
 	# Enable Arm CoreSight
 	./scripts/config --file $OUT/.config -e CONFIG_PID_IN_CONTEXTIDR
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINKS_AND_SINKS
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_LINK_AND_SINK_TMC
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CATU
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_TPIU
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SINK_ETBV10
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM3X
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_SOURCE_ETM4X
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_STM
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTCU
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CPU_DEBUG
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TRBE
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_TNOC
-	./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_DUMMY
+
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_LINKS_AND_SINKS
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_LINK_AND_SINK_TMC
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CATU
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SINK_TPIU
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SINK_ETBV10
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SOURCE_ETM3X
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_SOURCE_ETM4X
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_STM
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CTCU
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CPU_DEBUG
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CTI
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_CTI_INTEGRATION_REGS
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_TRBE
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_TNOC
+	./scripts/config --file $OUT/.config -m CONFIG_CORESIGHT_DUMMY
 
 	#./scripts/config --file $OUT/.config -e CONFIG_KUNIT
 	#./scripts/config --file $OUT/.config -e CONFIG_CORESIGHT_KUNIT_TESTS
@@ -242,6 +243,8 @@ function config_bpf_selftest {
 	./scripts/config --file $OUT/.config -e CONFIG_NET_IPGRE_DEMUX
 	./scripts/config --file $OUT/.config -e CONFIG_IPV6_GRE
 	./scripts/config --file $OUT/.config -e CONFIG_NET_ACT_TUNNEL_KEY
+	./scripts/config --file $OUT/.config -e CONFIG_LWTUNNEL
+	./scripts/config --file $OUT/.config -e CONFIG_LWTUNNEL_BPF
 }
 
 function config_hikey960 {
